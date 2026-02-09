@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Users</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial;background:#0b1220;color:#fff;min-height:100vh}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px)}
+    .brand{font-weight:900}
+    nav a{color:#8ab4ff;text-decoration:none;margin-left:14px;font-weight:800}
+    nav a:hover{text-decoration:underline}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 12px 26px rgba(0,0,0,.35)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;vertical-align:top}
+    th{opacity:.85}
+    .btn{padding:8px 12px;border-radius:12px;border:none;background:#2d6cdf;color:#fff;font-weight:900;cursor:pointer}
+    .btn:hover{filter:brightness(1.08)}
+    .btn.danger{background:rgba(255,138,138,.14);border:1px solid rgba(255,138,138,.35);color:#ffb3b3}
+    .btn.success{background:rgba(138,255,179,.14);border:1px solid rgba(138,255,179,.35);color:#8affb3}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;}
+    .muted{opacity:.8}
+    .active-badge{display:inline-block;padding:4px 8px;border-radius:6px;font-size:0.85rem;font-weight:bold}
+    .active-true{background:rgba(138,255,179,.2);color:#8affb3}
+    .active-false{background:rgba(255,138,138,.2);color:#ff8a8a}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Smart Farmer • Manage Users</div>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="manage_complaints.html">Complaints</a>
+      <a href="view_feedback.html">Feedback</a>
+      <a href="manage_inventory.html">Inventory</a>
+      <a href="manage_users.html">Users</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <h2 style="margin:0 0 6px">Manage Users</h2>
+      <div class="muted">View and manage all registered users.</div>
+
+      <div style="margin-top:10px;display:flex;gap:10px">
+        <button class="btn" id="refreshBtn">🔄 Refresh</button>
+        <input type="text" id="searchInput" placeholder="Search users..." style="padding:8px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#fff;flex-grow:1">
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/admin-logic.js"></script>
+
+  <script>
+    console.log("👥 Manage Users Page Loading...");
+    
+    // Get DOM elements
+    const tbody = document.getElementById("tbody");
+    const searchInput = document.getElementById("searchInput");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    
+    let allUsers = [];
+    
+    // Initialize Firebase
+    if (typeof firebase !== 'undefined') {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          console.log("❌ No user logged in, redirecting...");
+          window.location.href = "login.html";
+        } else {
+          console.log("✅ Admin logged in:", user.email);
+          loadUsers();
+        }
+      });
+    }
+    
+    // Load users function
+    async function loadUsers() {
+      console.log("📋 Loading users...");
+      
+      // Show loading
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 40px;">
+            <div style="color: #8ab4ff; font-size: 1.2rem;">Loading users...</div>
+          </td>
+        </tr>`;
+      
+      try {
+        // Check if function exists
+        if (typeof loadAllUsers !== 'function') {
+          throw new Error("loadAllUsers function not found");
+        }
+        
+        allUsers = await loadAllUsers();
+        console.log(`✅ Loaded ${allUsers.length} users`);
+        
+        renderUsers(allUsers);
+        
+      } catch (error) {
+        console.error("❌ Error loading users:", error);
+        
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: #ff8a8a;">
+              <div style="font-size: 1.2rem;">Failed to Load Users</div>
+              <div class="muted">Error: ${error.message}</div>
+              <button class="btn" onclick="loadUsers()" style="margin-top: 16px;">Retry</button>
+            </td>
+          </tr>`;
+      }
+    }
+    
+    // Render users function
+    function renderUsers(users) {
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px;">
+              <div style="color: #8ab4ff; font-size: 1.2rem;">No Users Found</div>
+              <div class="muted">No users registered yet</div>
+            </td>
+          </tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = users.map(user => {
+        const joinDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A';
+        const isActive = user.isActive !== false; // Default to true if not set
+        
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(user.name || 'No Name')}</strong>
+              <div class="muted">ID: ${user._id?.substring(0, 8) || 'N/A'}</div>
+            </td>
+            <td>${escapeHtml(user.email || 'No Email')}</td>
+            <td>
+              <span class="active-badge ${user.role === 'admin' ? 'active-true' : ''}">
+                ${escapeHtml(user.role || 'farmer')}
+              </span>
+            </td>
+            <td>
+              <span class="active-badge ${isActive ? 'active-true' : 'active-false'}">
+                ${isActive ? 'Active' : 'Inactive'}
+              </span>
+            </td>
+            <td>${joinDate}</td>
+            <td>
+              <button class="btn ${isActive ? 'danger' : 'success'}" onclick="toggleUserStatus('${user._id}', ${isActive})">
+                ${isActive ? 'Deactivate' : 'Activate'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+    
+    // Toggle user status
+    async function toggleUserStatus(userId, currentStatus) {
+      if (!confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) {
+        return;
+      }
+      
+      try {
+        // Check if function exists
+        if (typeof toggleUserStatus !== 'function') {
+          throw new Error("toggleUserStatus function not found");
+        }
+        
+        // Note: This is a naming conflict - we're calling the function from admin-logic.js
+        // but also have a local function with the same name
+        if (typeof window.toggleUserStatus === 'function') {
+          const result = await window.toggleUserStatus(userId, currentStatus);
+          console.log("✅ User status toggled:", result);
+          
+          // Reload users
+          loadUsers();
+          
+          alert(`User ${currentStatus ? 'deactivated' : 'activated'} successfully!`);
+        } else {
+          throw new Error("Toggle function not available");
+        }
+        
+      } catch (error) {
+        console.error("❌ Error toggling user:", error);
+        alert("Failed to update user: " + error.message);
+      }
+    }
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      
+      if (!searchTerm) {
+        renderUsers(allUsers);
+        return;
+      }
+      
+      const filteredUsers = allUsers.filter(user => 
+        (user.name && user.name.toLowerCase().includes(searchTerm)) ||
+        (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+        (user.role && user.role.toLowerCase().includes(searchTerm))
+      );
+      
+      renderUsers(filteredUsers);
+    });
+    
+    // Event listeners
+    refreshBtn.onclick = loadUsers;
+    
+    logoutBtn.onclick = function(e) {
+      e.preventDefault();
+      if (confirm("Are you sure you want to logout?")) {
+        if (typeof window.logout === 'function') {
+          window.logout();
+        } else {
+          firebase.auth().signOut().then(() => {
+            window.location.href = "login.html";
+          });
+        }
+      }
+    };
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    console.log("✅ Manage Users Page Ready");
+  </script>
+</body>
+</html>

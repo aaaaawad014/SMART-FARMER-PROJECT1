@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Complaints</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Arial;background:#0b1220;color:#fff;min-height:100vh}
+    header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px)}
+    .brand{font-weight:900}
+    nav a{color:#8ab4ff;text-decoration:none;margin-left:14px;font-weight:800}
+    nav a:hover{text-decoration:underline}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 12px 26px rgba(0,0,0,.35)}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;vertical-align:top}
+    th{opacity:.85}
+    input,select,textarea{width:100%;padding:9px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#fff;outline:none}
+    textarea{min-height:66px;resize:vertical}
+    .btn{padding:10px 12px;border-radius:12px;border:none;background:#2d6cdf;color:#fff;font-weight:900;cursor:pointer}
+    .btn:hover{filter:brightness(1.08)}
+    .btn.danger{background:rgba(255,138,138,.12);border:1px solid rgba(255,138,138,.35);color:#ffb3b3}
+    .btn:disabled{opacity:0.5; cursor: not-allowed;}
+    .muted{opacity:.8}
+    .small-text{font-size:0.85rem;}
+
+    /* Status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    .status-pending { background: rgba(255, 138, 138, 0.2); color: #ff8a8a; }
+    .status-in-progress { background: rgba(255, 213, 138, 0.2); color: #ffd58a; }
+    .status-resolved { background: rgba(138, 255, 179, 0.2); color: #8affb3; }
+
+    /* Modal */
+    .modalBack{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; padding:16px; z-index:50}
+    .modal{width:440px;max-width:95vw;background:rgba(10,14,26,.92);border:1px solid rgba(255,255,255,.14);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.65);padding:16px}
+    .mHead{display:flex;align-items:center;justify-content:space-between}
+    .mTitle{font-weight:900}
+    .mClose{border:0;background:transparent;color:rgba(255,255,255,.75);font-size:20px;cursor:pointer}
+    .mBody{color:rgba(255,255,255,.78);margin-top:8px;line-height:1.45}
+    .mBtns{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+    .mBtn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:900}
+    .mBtn.primary{background:#2d6cdf;border:0}
+    .mBtn.danger{background:rgba(255,138,138,.12);border:1px solid rgba(255,138,138,.35);color:#ffb3b3}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Smart Farmer • Manage Complaints</div>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="manage_complaints.html">Manage Complaints</a>
+      <a href="view_feedback.html">View Feedback</a>
+      <a href="manage_inventory.html">Manage Inventory</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <h2 style="margin:0 0 6px">All Complaints</h2>
+      <div class="muted">Update status and add resolution notes for farmers.</div>
+
+      <div style="margin-top:10px;display:flex;gap:10px">
+        <button class="btn" id="refreshBtn">Refresh</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:15%">Title</th>
+            <th style="width:20%">Message</th>
+            <th style="width:15%">Farmer</th>
+            <th style="width:12%">Status</th>
+            <th style="width:20%">Resolution Notes</th>
+            <th style="width:18%">Actions & Info</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="mHead">
+        <div class="mTitle" id="mTitle">Message</div>
+        <button class="mClose" id="mClose">×</button>
+      </div>
+      <div class="mBody" id="mBody"></div>
+      <div class="mBtns" id="mBtns"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/admin-logic.js"></script>
+
+  <script>
+    // ===================== INITIALIZATION =====================
+    console.log("📋 Manage Complaints Page Initializing...");
+    
+    // Get DOM elements
+    const modalBack = document.getElementById("modalBack");
+    const mTitle = document.getElementById("mTitle");
+    const mBody = document.getElementById("mBody");
+    const mBtns = document.getElementById("mBtns");
+    const tbody = document.getElementById("tbody");
+    
+    // ===================== MODAL FUNCTIONS =====================
+    document.getElementById("mClose").onclick = () => modalBack.style.display = "none";
+    
+    function popup({title = "Message", message = "", buttons = [{text: "OK", type: "primary"}]}) {
+      mTitle.textContent = title;
+      mBody.textContent = message;
+      mBtns.innerHTML = "";
+      
+      buttons.forEach(b => {
+        const btn = document.createElement("button");
+        btn.className = "mBtn " + (b.type || "");
+        btn.textContent = b.text || "OK";
+        btn.onclick = () => {
+          if (b.onClick) b.onClick();
+          modalBack.style.display = "none";
+        };
+        mBtns.appendChild(btn);
+      });
+      
+      modalBack.style.display = "flex";
+    }
+    
+    // Escape HTML to prevent XSS
+    function esc(s) {
+      if (s === null || s === undefined) return "";
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;',
+        '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+    
+    // Format date
+    function formatDate(dateString) {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      return date.toLocaleDateString() + " " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+    
+    // Get status badge HTML
+    function getStatusBadge(status) {
+      const statusLower = (status || "").toLowerCase();
+      let className = "status-pending";
+      let displayText = "Pending";
+      
+      if (statusLower.includes("progress")) {
+        className = "status-in-progress";
+        displayText = "In Progress";
+      } else if (statusLower.includes("resolve")) {
+        className = "status-resolved";
+        displayText = "Resolved";
+      }
+      
+      return `<span class="status-badge ${className}">${displayText}</span>`;
+    }
+    
+    // ===================== AUTHENTICATION =====================
+    // Initialize Firebase Auth
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    
+    // Check if user is logged in
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        console.log("❌ No user logged in, redirecting to login...");
+        window.location.href = "login.html";
+      } else {
+        console.log("✅ User logged in:", user.email);
+        // Get user token to verify backend connection
+        try {
+          const token = await user.getIdToken();
+          console.log("✅ Firebase token obtained");
+          // Initial render
+          render();
+        } catch (error) {
+          console.error("❌ Error getting token:", error);
+          popup({
+            title: "Auth Error",
+            message: "Failed to authenticate. Please login again.",
+            buttons: [{
+              text: "Login Again",
+              type: "primary",
+              onClick: () => window.location.href = "login.html"
+            }]
+          });
+        }
+      }
+    });
+    
+    // ===================== LOGOUT =====================
+    document.getElementById("logoutBtn").onclick = (e) => {
+      e.preventDefault();
+      popup({
+        title: "Confirm Logout",
+        message: "Are you sure you want to logout from the admin panel?",
+        buttons: [
+          { text: "Cancel", type: "" },
+          {
+            text: "Logout",
+            type: "danger",
+            onClick: () => {
+              auth.signOut().then(() => {
+                window.location.href = "login.html";
+              }).catch(error => {
+                console.error("Logout error:", error);
+                popup({
+                  title: "Logout Failed",
+                  message: "Failed to logout: " + error.message,
+                  buttons: [{ text: "OK", type: "danger" }]
+                });
+              });
+            }
+          }
+        ]
+      });
+    };
+    
+    // ===================== COMPLAINTS RENDERING =====================
+    async function render() {
+      console.log("🔄 Loading complaints...");
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 40px;">
+            <div style="color: #8ab4ff; font-size: 1.2rem;">Loading complaints...</div>
+            <div class="muted">Fetching data from server</div>
+          </td>
+        </tr>`;
+      
+      try {
+        // Check if loadAllComplaints function exists
+        if (typeof loadAllComplaints !== 'function') {
+          throw new Error("loadAllComplaints function not found. Check admin-logic.js");
+        }
+        
+        const complaints = await loadAllComplaints();
+        console.log(`✅ Loaded ${complaints.length} complaints`);
+        
+        if (!complaints || complaints.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px;">
+                <div style="color: #8ab4ff; font-size: 1.2rem;">No Complaints Found</div>
+                <div class="muted">When farmers submit complaints, they will appear here</div>
+              </td>
+            </tr>`;
+          return;
+        }
+        
+        // Render complaints table
+        tbody.innerHTML = complaints.map(complaint => {
+          const complaintId = complaint._id || complaint.id || "unknown";
+          const currentStatus = (complaint.status || "pending").toLowerCase();
+          
+          return `
+            <tr data-id="${esc(complaintId)}">
+              <td>
+                <strong>${esc(complaint.title || "No Title")}</strong>
+                <div class="small-text muted">ID: ${complaintId.substring(0, 8)}...</div>
+              </td>
+              <td>${esc(complaint.message || "No message")}</td>
+              <td>
+                <div><strong>${esc(complaint.farmerName || complaint.farmerEmail || "Unknown")}</strong></div>
+                <div class="small-text muted">${esc(complaint.farmerEmail || "")}</div>
+                <div class="small-text muted">Submitted: ${formatDate(complaint.createdAt)}</div>
+              </td>
+              <td>
+                ${getStatusBadge(currentStatus)}
+                <select class="status" style="margin-top: 8px; width: 100%;">
+                  <option value="pending" ${currentStatus === "pending" ? "selected" : ""}>Pending</option>
+                  <option value="in-progress" ${currentStatus === "in-progress" ? "selected" : ""}>In Progress</option>
+                  <option value="resolved" ${currentStatus === "resolved" ? "selected" : ""}>Resolved</option>
+                </select>
+              </td>
+              <td>
+                <textarea class="notes" placeholder="Enter resolution notes here..." style="width: 100%; min-height: 80px;">${esc(complaint.resolutionNotes || "")}</textarea>
+              </td>
+              <td>
+                <button class="btn update" style="width: 100%; margin-bottom: 8px;">Update Status</button>
+                <div class="small-text muted">
+                  ${complaint.updatedAt ? `Last updated: ${formatDate(complaint.updatedAt)}` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+        
+        // Attach event listeners to update buttons
+        tbody.querySelectorAll(".update").forEach(btn => {
+          btn.onclick = async () => {
+            const tr = btn.closest("tr");
+            const complaintId = tr.getAttribute("data-id");
+            const status = tr.querySelector(".status").value;
+            const resolutionNotes = tr.querySelector(".notes").value.trim();
+            
+            // Validate
+            if (!complaintId || complaintId === "unknown") {
+              popup({
+                title: "Error",
+                message: "Invalid complaint ID",
+                buttons: [{ text: "OK", type: "danger" }]
+              });
+              return;
+            }
+            
+            // Disable button and show loading
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = "Updating...";
+            
+            try {
+              console.log(`🔄 Updating complaint ${complaintId}:`, { status, resolutionNotes });
+              
+              // Check if updateComplaint function exists
+              if (typeof updateComplaint !== 'function') {
+                throw new Error("updateComplaint function not found. Check admin-logic.js");
+              }
+              
+              const result = await updateComplaint(complaintId, { 
+                status, 
+                resolutionNotes 
+              });
+              
+              console.log("✅ Update successful:", result);
+              
+              // Show success message
+              popup({
+                title: "Success ✅",
+                message: "Complaint updated successfully!",
+                buttons: [{
+                  text: "OK",
+                  type: "primary",
+                  onClick: () => {
+                    // Refresh the list
+                    render();
+                  }
+                }]
+              });
+              
+            } catch (error) {
+              console.error("❌ Update failed:", error);
+              
+              // Re-enable button
+              btn.disabled = false;
+              btn.textContent = originalText;
+              
+              // Show error
+              popup({
+                title: "Update Failed ❌",
+                message: error.message || "Failed to update complaint. Please try again.",
+                buttons: [{ text: "OK", type: "danger" }]
+              });
+            }
+          };
+        });
+        
+      } catch (error) {
+        console.error("❌ Error loading complaints:", error);
+        
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: #ff8a8a;">
+              <div style="font-size: 1.2rem;">Failed to Load Complaints</div>
+              <div class="muted">Error: ${esc(error.message)}</div>
+              <button class="btn" onclick="render()" style="margin-top: 16px;">Retry</button>
+            </td>
+          </tr>`;
+        
+        popup({
+          title: "Load Failed ❌",
+          message: error.message || "Failed to load complaints from server. Check console for details.",
+          buttons: [{ text: "OK", type: "danger" }]
+        });
+      }
+    }
+    
+    // ===================== EVENT LISTENERS =====================
+    document.getElementById("refreshBtn").onclick = render;
+    
+    // Initial load
+    console.log("🚀 Manage Complaints Page Ready");
+    
+    // Debug: Check if functions are available
+    console.log("🔍 Function check:", {
+      loadAllComplaints: typeof loadAllComplaints,
+      updateComplaint: typeof updateComplaint,
+      firebase: typeof firebase,
+      auth: typeof auth
+    });
+    
+  </script>
+</body>
+</html>

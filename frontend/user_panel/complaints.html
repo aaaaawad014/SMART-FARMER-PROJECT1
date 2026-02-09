@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farmer - Complaints</title>
+
+  <style>
+    :root{
+      --primary:#2d6cdf;
+      --primary2:#58a6ff;
+      --bg:#070a13;
+      --card: rgba(255,255,255,.07);
+      --card2: rgba(255,255,255,.05);
+      --text:#eaf6ff;
+      --muted:#9bbcff;
+      --border: rgba(255,255,255,.14);
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --success:#00d68f;
+      --warning:#ffaa00;
+      --danger:#ff4757;
+      --radius:18px;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      color: var(--text);
+      min-height:100vh;
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+
+    /* ======= PROFESSIONAL BACKGROUND (image + overlay + glows) ======= */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-3;
+      background:
+        linear-gradient(rgba(7,10,19,.78), rgba(7,10,19,.92)),
+        url("https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?auto=format&fit=crop&w=2000&q=80");
+      background-size:cover;
+      background-position:center;
+      background-attachment:fixed;
+      filter:saturate(1.05);
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:-120px;
+      z-index:-2;
+      background:
+        radial-gradient(700px 400px at 18% 10%, rgba(88,166,255,.20), transparent 60%),
+        radial-gradient(800px 450px at 85% 25%, rgba(45,108,223,.18), transparent 60%),
+        radial-gradient(600px 380px at 35% 95%, rgba(0,214,143,.10), transparent 60%);
+      pointer-events:none;
+    }
+
+    /* ======= NAVBAR ======= */
+    .navbar{
+      position:sticky;
+      top:0;
+      z-index:100;
+      background: rgba(7,10,19,.55);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+
+    .nav-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:40px;height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(135deg, rgba(88,166,255,.22), rgba(45,108,223,.22));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 12px 28px rgba(0,0,0,.25);
+      font-size:20px;
+    }
+    .brand-text{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:.2px;
+      background: linear-gradient(90deg, var(--primary2), var(--primary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .brand-sub{
+      display:block;
+      font-size:12px;
+      color: rgba(155,188,255,.9);
+      margin-top:2px;
+      font-weight:500;
+    }
+
+    .nav-menu{
+      list-style:none;
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+    }
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      text-decoration:none;
+      color: rgba(155,188,255,.95);
+      border-radius:12px;
+      font-weight:600;
+      transition: transform .2s, background .2s, color .2s, box-shadow .2s;
+      white-space:nowrap;
+    }
+    .nav-link:hover{
+      color:#fff;
+      background: rgba(255,255,255,.08);
+      transform: translateY(-1px);
+    }
+    .nav-link.active{
+      color:#fff;
+      background: linear-gradient(135deg, rgba(45,108,223,.95), rgba(88,166,255,.95));
+      box-shadow: 0 10px 26px rgba(45,108,223,.28);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .nav-right{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .user-info{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .user-avatar{
+      width:38px;height:38px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      background: linear-gradient(135deg, rgba(45,108,223,.95), rgba(88,166,255,.95));
+      box-shadow: 0 10px 26px rgba(45,108,223,.25);
+    }
+    .user-details{display:flex;flex-direction:column;line-height:1.1}
+    .user-name{font-weight:700;font-size:13px}
+    .user-role{font-size:12px;color: rgba(155,188,255,.9)}
+
+    .logout-btn{
+      padding:10px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      border: 1px solid rgba(255,71,87,.30);
+      background: rgba(255,71,87,.10);
+      color: #ff6b78;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      transition: transform .2s, background .2s, box-shadow .2s;
+    }
+    .logout-btn:hover{
+      background: rgba(255,71,87,.16);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(255,71,87,.12);
+    }
+
+    /* ======= CONTAINER / HEADER ======= */
+    .container{
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 30px 18px 50px;
+    }
+    .page-header{
+      margin-bottom: 22px;
+      padding: 18px 18px 0;
+    }
+    .page-header h1{
+      font-size: 34px;
+      letter-spacing:.2px;
+      background: linear-gradient(90deg, var(--primary2), var(--primary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom: 10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .page-header p{
+      color: rgba(155,188,255,.95);
+      font-size: 15px;
+      max-width: 860px;
+      line-height:1.6;
+    }
+
+    /* ======= CARDS ======= */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin: 18px 0;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      animation: fadeUp .45s ease both;
+    }
+    @keyframes fadeUp{
+      from{opacity:0; transform: translateY(10px)}
+      to{opacity:1; transform: translateY(0)}
+    }
+
+    .card h2{
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 14px;
+    }
+    .card h2 span{
+      width:34px;height:34px;
+      border-radius: 12px;
+      display:grid;
+      place-items:center;
+      background: rgba(88,166,255,.12);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    /* ======= FORM ======= */
+    .form-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 720px){
+      .form-row{grid-template-columns: 1fr}
+    }
+
+    .form-group{margin-bottom: 14px;}
+    label{
+      display:block;
+      margin-bottom:8px;
+      color: rgba(155,188,255,.95);
+      font-weight:700;
+      font-size: 13px;
+    }
+
+    input, textarea{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: transform .2s, border .2s, box-shadow .2s, background .2s;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(88,166,255,.65);
+      box-shadow: 0 0 0 4px rgba(88,166,255,.12);
+      background: rgba(255,255,255,.09);
+    }
+    textarea{min-height: 130px; resize: vertical;}
+
+    /* ======= BUTTONS ======= */
+    .btn{
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor:pointer;
+      border: 1px solid transparent;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .btn-primary{
+      color:#fff;
+      background: linear-gradient(135deg, rgba(45,108,223,.95), rgba(88,166,255,.95));
+      box-shadow: 0 14px 34px rgba(45,108,223,.25);
+    }
+    .btn-primary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(45,108,223,.30);
+    }
+    .btn-primary:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .btn-secondary{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+    }
+    .btn-secondary:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+    }
+
+    /* ======= TABLE ======= */
+    .table-container{
+      overflow-x:auto;
+      margin-top: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      background: rgba(7,10,19,.55);
+      backdrop-filter: blur(12px);
+      text-align:left;
+      padding: 14px 14px;
+      font-size: 12px;
+      letter-spacing:.35px;
+      text-transform: uppercase;
+      color: rgba(155,188,255,.95);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    tbody td{
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 14px;
+    }
+    tbody tr:hover{
+      background: rgba(255,255,255,.05);
+    }
+
+    /* Status badges */
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      border: 1px solid rgba(255,255,255,.10);
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px;height:8px;
+      border-radius:999px;
+      background: currentColor;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .status-pending{
+      background: rgba(255,170,0,.13);
+      color: var(--warning);
+      border-color: rgba(255,170,0,.25);
+    }
+    .status-in-progress{
+      background: rgba(88,166,255,.13);
+      color: var(--primary2);
+      border-color: rgba(88,166,255,.25);
+    }
+    .status-resolved{
+      background: rgba(0,214,143,.13);
+      color: var(--success);
+      border-color: rgba(0,214,143,.25);
+    }
+
+    /* ======= STATES ======= */
+    .loading,.empty-state{
+      text-align:center;
+      padding: 38px 12px;
+      color: rgba(155,188,255,.95);
+    }
+    .loading .spin{
+      width:26px;height:26px;
+      border-radius:999px;
+      border: 3px solid rgba(255,255,255,.18);
+      border-top-color: rgba(88,166,255,.9);
+      margin: 0 auto 12px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .error{
+      margin: 12px 0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,71,87,.25);
+      background: rgba(255,71,87,.10);
+      color: #ff98a1;
+      display:none;
+    }
+
+    /* ======= MODAL (premium) ======= */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.62);
+      z-index:1000;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .modal-content{
+      width: 100%;
+      max-width: 520px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      backdrop-filter: blur(18px);
+      box-shadow: 0 30px 80px rgba(0,0,0,.55);
+      overflow:hidden;
+      animation: pop .22s ease both;
+    }
+    @keyframes pop{
+      from{transform: translateY(8px) scale(.98); opacity:0}
+      to{transform: translateY(0) scale(1); opacity:1}
+    }
+    .modal-header{
+      padding: 16px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .modal-title{
+      font-weight: 900;
+      letter-spacing:.2px;
+    }
+    .modal-close{
+      width:36px;height:36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(155,188,255,.95);
+      font-size: 22px;
+      cursor:pointer;
+      line-height:1;
+      display:grid;
+      place-items:center;
+      transition: transform .2s, background .2s;
+    }
+    .modal-close:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+    }
+    .modal-body{
+      padding: 16px;
+      color: rgba(230,247,255,.92);
+      line-height:1.6;
+    }
+    .modal-footer{
+      padding: 14px 16px 16px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .nav-container{flex-wrap:wrap; justify-content:center}
+      .nav-right{width:100%; justify-content:space-between}
+      .nav-menu{flex-wrap:wrap; justify-content:center}
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========== NAVIGATION BAR ========== -->
+  <div class="navbar">
+    <div class="nav-container">
+
+      <div class="nav-brand">
+        <div class="logo">🌾</div>
+        <div>
+          <div class="brand-text">Smart Farmer</div>
+          <span class="brand-sub">Complaints & Support</span>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link"><span>📊</span> Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a href="inventory.html" class="nav-link"><span>📦</span> Inventory</a>
+        </li>
+        <li class="nav-item">
+          <a href="complaints.html" class="nav-link active"><span>📝</span> Complaints</a>
+        </li>
+        <li class="nav-item">
+          <a href="feedback.html" class="nav-link"><span>⭐</span> Feedback</a>
+        </li>
+        <li class="nav-item">
+          <a href="view_reverts.html" class="nav-link"><span>✅</span> Resolutions</a>
+        </li>
+      </ul>
+
+      <div class="nav-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userInitial">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Farmer</div>
+          </div>
+        </div>
+
+        <button class="logout-btn" id="logoutBtn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+
+    <div class="page-header">
+      <h1>📝 Submit a Complaint</h1>
+      <p>
+        Report any issue you’re facing (seed quality, delivery delays, system errors, etc.).
+        Our admin team will review it and send a response in your complaint history.
+      </p>
+    </div>
+
+    <!-- Submit Complaint -->
+    <div class="card">
+      <h2><span>📤</span> Submit New Complaint</h2>
+
+      <div class="form-group">
+        <label for="title">Title *</label>
+        <input type="text" id="title" placeholder="e.g. Seed quality issue" required>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message *</label>
+        <textarea id="message" placeholder="Explain your issue in detail..." required></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="submitBtn">Send Complaint</button>
+    </div>
+
+
+    <!-- Complaint History -->
+    <div class="card">
+      <h2><span>📋</span> My Complaint History</h2>
+
+      <div id="loading" class="loading">
+        <div class="spin"></div>
+        Loading your complaints...
+      </div>
+
+      <div id="error" class="error"></div>
+
+      <div class="table-container">
+        <table id="complaintsTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Response</th>
+            </tr>
+          </thead>
+          <tbody id="complaintsBody"></tbody>
+        </table>
+      </div>
+
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div style="font-size:52px;margin-bottom:10px;">📭</div>
+        <div style="font-weight:900;font-size:18px;margin-bottom:6px;">No Complaints Yet</div>
+        <p style="opacity:.9; line-height:1.6;">
+          You haven’t submitted any complaints. When you submit one, it will appear here.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Modal -->
+  <div class="modal" id="messageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle"></div>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+
+  <!-- Scripts (same as your original - NO working change) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/farmer-logic.js"></script>
+
+  <script>
+    // ========== MAIN COMPLAINTS PAGE CODE ==========
+    console.log("📝 Complaints page loading...");
+
+    // DOM Elements
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const tableEl = document.getElementById('complaintsTable');
+    const tbodyEl = document.getElementById('complaintsBody');
+    const emptyStateEl = document.getElementById('emptyState');
+    const submitBtn = document.getElementById('submitBtn');
+    const modal = document.getElementById('messageModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalFooter = document.getElementById('modalFooter');
+    const userNameEl = document.getElementById('userName');
+    const userInitialEl = document.getElementById('userInitial');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("🎯 Complaints page initialized");
+
+      // Check if required functions exist
+      if (!checkRequiredFunctions()) {
+        console.error("❌ Required functions missing!");
+        return;
+      }
+
+      console.log("✅ Complaint functions are available:");
+      console.log("  - addComplaint:", typeof window.addComplaint);
+      console.log("  - loadMyComplaints:", typeof window.loadMyComplaints);
+
+      // Check login
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          console.log("✅ User logged in:", user.email);
+          updateUserInfo(user);
+          setupEventListeners();
+          loadComplaints();
+        } else {
+          console.warn("⚠️ No user logged in, redirecting to login...");
+          window.location.href = "login.html";
+        }
+      });
+    });
+
+    function updateUserInfo(user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      userNameEl.textContent = displayName;
+      userInitialEl.textContent = displayName.charAt(0).toUpperCase();
+    }
+
+    function checkRequiredFunctions() {
+      const requiredFuncs = ['addComplaint', 'loadMyComplaints'];
+      const missingFuncs = [];
+
+      for (const funcName of requiredFuncs) {
+        if (typeof window[funcName] !== 'function') {
+          missingFuncs.push(funcName);
+        }
+      }
+
+      if (missingFuncs.length > 0) {
+        showError(`Missing required functions: ${missingFuncs.join(', ')}. Please check if farmer-logic.js is loaded correctly.`);
+        return false;
+      }
+      return true;
+    }
+
+    function setupEventListeners() {
+      // Submit complaint button
+      submitBtn.onclick = async function() {
+        const title = document.getElementById('title').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        if (!title || !message) {
+          showModal('Missing Information', 'Please fill in both title and message fields.');
+          return;
+        }
+
+        this.disabled = true;
+        const originalText = this.textContent;
+        this.textContent = 'Submitting...';
+
+        try {
+          console.log("Submitting complaint...");
+          const result = await window.addComplaint({ title, message });
+          console.log("Complaint submission result:", result);
+
+          document.getElementById('title').value = '';
+          document.getElementById('message').value = '';
+
+          showModal('Success ✅', 'Your complaint has been submitted successfully! Admin will review it shortly.', [
+            { text: 'OK', type: 'primary', onClick: () => modal.style.display = 'none' }
+          ]);
+
+          loadComplaints();
+
+        } catch (error) {
+          console.error("❌ Error submitting complaint:", error);
+          showModal('Error ❌', 'Failed to submit complaint: ' + error.message, [
+            { text: 'OK', type: 'danger', onClick: () => modal.style.display = 'none' }
+          ]);
+        } finally {
+          this.disabled = false;
+          this.textContent = originalText;
+        }
+      };
+
+      // Logout button
+      logoutBtn.onclick = function(e) {
+        e.preventDefault();
+        showModal('Confirm Logout', 'Are you sure you want to logout?', [
+          { text: 'Cancel', type: 'secondary', onClick: () => modal.style.display = 'none' },
+          { text: 'Logout', type: 'danger', onClick: () => {
+            if (typeof window.logout === 'function') {
+              window.logout('../index.html');
+            } else {
+              firebase.auth().signOut().then(() => {
+                window.location.href = "../index.html";
+              });
+            }
+          }}
+        ]);
+      };
+
+      // Modal close button
+      document.getElementById('modalClose').onclick = function() {
+        modal.style.display = 'none';
+      };
+
+      // Close modal on background click
+      modal.onclick = function(e) {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      };
+    }
+
+    async function loadComplaints() {
+      console.log("📋 Loading complaints...");
+
+      try {
+        loadingEl.style.display = 'block';
+        errorEl.style.display = 'none';
+        tableEl.style.display = 'none';
+        emptyStateEl.style.display = 'none';
+
+        console.log("Calling loadMyComplaints...");
+        const complaints = await window.loadMyComplaints();
+        console.log("Complaints loaded:", complaints);
+
+        loadingEl.style.display = 'none';
+
+        if (!complaints || complaints.length === 0) {
+          emptyStateEl.style.display = 'block';
+          return;
+        }
+
+        renderComplaintsTable(complaints);
+        tableEl.style.display = 'table';
+
+      } catch (error) {
+        console.error("❌ Failed to load complaints:", error);
+
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.textContent = `Failed to load complaints: ${error.message}`;
+
+        tableEl.style.display = 'none';
+        emptyStateEl.style.display = 'none';
+      }
+    }
+
+    function renderComplaintsTable(complaints) {
+      let tableHTML = '';
+
+      complaints.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+      complaints.forEach(complaint => {
+        const date = new Date(complaint.createdAt || Date.now());
+        const formattedDate = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        let statusClass = 'status-pending';
+        let statusText = complaint.status || 'Pending';
+
+        if (statusText.toLowerCase().includes('progress')) {
+          statusClass = 'status-in-progress';
+          statusText = 'In Progress';
+        } else if (statusText.toLowerCase().includes('resolve')) {
+          statusClass = 'status-resolved';
+          statusText = 'Resolved';
+        }
+
+        tableHTML += `
+          <tr>
+            <td><strong>${escapeHtml(complaint.title)}</strong></td>
+            <td>
+              <span class="status-badge ${statusClass}">
+                <span class="dot"></span>
+                ${statusText}
+              </span>
+            </td>
+            <td>${formattedDate}</td>
+            <td>
+              ${complaint.resolutionNotes
+                ? `<span style="color: rgba(230,247,255,.92); font-size: 13px;">${escapeHtml(complaint.resolutionNotes)}</span>`
+                : '<span style="color: rgba(155,188,255,.95); font-style: italic; font-size: 13px;">Waiting for admin response</span>'
+              }
+            </td>
+          </tr>
+        `;
+      });
+
+      tbodyEl.innerHTML = tableHTML;
+    }
+
+    function showError(message) {
+      errorEl.style.display = 'block';
+      errorEl.textContent = message;
+      loadingEl.style.display = 'none';
+      tableEl.style.display = 'none';
+      emptyStateEl.style.display = 'none';
+    }
+
+    function showModal(title, message, buttons = []) {
+      modalTitle.textContent = title;
+      modalBody.textContent = message;
+      modalFooter.innerHTML = '';
+
+      if (buttons.length === 0) {
+        buttons = [{ text: 'OK', type: 'primary', onClick: () => modal.style.display = 'none' }];
+      }
+
+      buttons.forEach(button => {
+        const btn = document.createElement('button');
+        btn.className = `btn ${button.type === 'primary' ? 'btn-primary' : 'btn-secondary'}`;
+        btn.textContent = button.text;
+        btn.onclick = button.onClick;
+        modalFooter.appendChild(btn);
+      });
+
+      modal.style.display = 'flex';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    console.log("✅ Complaints page script loaded");
+  </script>
+</body>
+</html>

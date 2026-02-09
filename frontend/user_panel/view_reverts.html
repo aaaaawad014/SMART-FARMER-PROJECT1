@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farmer - My Resolutions</title>
+  
+  <style>
+    :root {
+      --bg: #070b14;
+      --card: rgba(255, 255, 255, 0.06);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #eaf2ff;
+      --muted: rgba(234, 242, 255, 0.75);
+      --blue: #2d6cdf;
+      --blue2: #58a6ff;
+      --green: #2ecc71;
+      --yellow: #f1c40f;
+      --red: #e74c3c;
+      --danger: #ff8a8a;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+      --radius: 16px;
+      --primary: #2d6cdf;
+      --primary-light: #58a6ff;
+      --background: #0a0e1a;
+      --border: rgba(255, 255, 255, 0.1);
+      --success: #00d68f;
+      --warning: #ffaa00;
+      --error: #ff4757;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0b1220 0%, #1a2332 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    /* ========== NAVIGATION BAR ========== */
+    .navbar {
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0 30px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+    }
+    
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      font-size: 28px;
+    }
+    
+    .brand-text {
+      font-size: 22px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 12px;
+    }
+    
+    .nav-item {
+      display: flex;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      text-decoration: none;
+      color: #8ab4ff;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
+    }
+    
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: #8ab4ff;
+    }
+    
+    .logout-btn {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(231, 76, 60, 0.2);
+    }
+    
+    /* ========== MAIN CONTENT ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-header p {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 25px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+    }
+    
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-open {
+      background: rgba(241, 196, 15, 0.15);
+      color: #f1c40f;
+      border: 1px solid rgba(241, 196, 15, 0.3);
+    }
+    
+    .status-inprogress {
+      background: rgba(52, 152, 219, 0.15);
+      color: #3498db;
+      border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+    
+    .status-resolved {
+      background: rgba(46, 204, 113, 0.15);
+      color: #2ecc71;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+    
+    .status-pending {
+      background: rgba(155, 89, 182, 0.15);
+      color: #9b59b6;
+      border: 1px solid rgba(155, 89, 182, 0.3);
+    }
+    
+    /* Complaint Cards */
+    .complaint-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+    
+    .complaint-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(88, 166, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .complaint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .complaint-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text);
+      flex: 1;
+    }
+    
+    .complaint-meta {
+      display: flex;
+      gap: 15px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .complaint-body {
+      margin-bottom: 20px;
+    }
+    
+    .complaint-message {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    
+    /* Resolution Section */
+    .resolution-section {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(52, 152, 219, 0.05));
+      border: 1px solid rgba(52, 152, 219, 0.15);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .resolution-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      color: var(--blue2);
+    }
+    
+    .resolution-header h3 {
+      margin-left: 10px;
+      font-size: 18px;
+    }
+    
+    .resolution-content {
+      color: var(--text);
+      line-height: 1.7;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid var(--blue);
+    }
+    
+    .resolution-date {
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    
+    .empty-state p {
+      max-width: 500px;
+      margin: 0 auto 20px;
+    }
+    
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--blue);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Error State */
+    .error-state {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+      color: #e74c3c;
+    }
+    
+    .error-state button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid rgba(231, 76, 60, 0.4);
+      color: #e74c3c;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(45, 108, 223, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 15px;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .page-header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== NAVIGATION BAR ========== -->
+  <div class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="logo">🌾</span>
+        <span class="brand-text">Smart Farmer</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="inventory.html" class="nav-link">
+            <span>📦</span> Inventory
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="complaints.html" class="nav-link">
+            <span>📝</span> Complaints
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="feedback.html" class="nav-link">
+            <span>⭐</span> Feedback
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="view_reverts.html" class="nav-link active">
+            <span>✅</span> Resolutions
+          </a>
+        </li>
+      </ul>
+      
+      <div class="nav-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userInitial">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Farmer</div>
+          </div>
+        </div>
+        
+        <button class="logout-btn" id="logoutBtn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>✅ My Complaint Resolutions</h1>
+      <p>View the status and resolution notes for your complaints. Admin responses will appear here once they update your complaints.</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="refreshBtn">
+          🔄 Refresh Resolutions
+        </button>
+        <button class="btn btn-secondary" onclick="location.href='complaints.html'">
+          📝 Submit New Complaint
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading your resolutions...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-state" style="display: none;">
+        <h3>⚠️ Error Loading Resolutions</h3>
+        <p id="errorMessage">An error occurred while loading your resolutions.</p>
+        <button onclick="loadResolutions()">🔄 Try Again</button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📭</div>
+        <h3>No Complaints Yet</h3>
+        <p>You haven't submitted any complaints. When you submit a complaint and admin responds, the resolution will appear here.</p>
+        <button class="btn btn-primary" onclick="location.href='complaints.html'">
+          📝 Submit Your First Complaint
+        </button>
+      </div>
+
+      <!-- Complaints List -->
+      <div id="complaintsList"></div>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/farmer-functions.js"></script>
+
+  <script>
+    // ========== RESOLUTIONS PAGE SCRIPT ==========
+    console.log("✅ Resolutions page loaded");
+    
+    // DOM Elements
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const emptyState = document.getElementById('emptyState');
+    const complaintsList = document.getElementById('complaintsList');
+    const errorMessage = document.getElementById('errorMessage');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userNameEl = document.getElementById('userName');
+    const userInitialEl = document.getElementById('userInitial');
+    
+    // Update user info
+    function updateUserInfo(user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      if (userNameEl) userNameEl.textContent = displayName;
+      if (userInitialEl) userInitialEl.textContent = displayName.charAt(0).toUpperCase();
+    }
+    
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("🚀 Initializing resolutions page...");
+      
+      // Check if user is logged in
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          console.warn("⚠️ No user logged in, redirecting...");
+          window.location.href = "login.html";
+        } else {
+          console.log(`✅ User logged in: ${user.email}`);
+          updateUserInfo(user);
+          
+          // Setup event listeners
+          setupEventListeners();
+          
+          // Load resolutions
+          setTimeout(loadResolutions, 1000);
+        }
+      });
+    });
+    
+    // ========== EVENT LISTENERS ==========
+    function setupEventListeners() {
+      // Refresh button
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+          refreshBtn.innerHTML = '🔄 Refreshing...';
+          refreshBtn.disabled = true;
+          await loadResolutions();
+          refreshBtn.innerHTML = '🔄 Refresh Resolutions';
+          refreshBtn.disabled = false;
+        });
+      }
+      
+      // Logout button
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (confirm("Are you sure you want to logout?")) {
+            if (typeof window.logout === 'function') {
+              window.logout("../index.html");
+            } else {
+              firebase.auth().signOut().then(() => {
+                window.location.href = "../index.html";
+              });
+            }
+          }
+        });
+      }
+    }
+    
+    // ========== LOAD RESOLUTIONS ==========
+    async function loadResolutions() {
+      console.log("📥 Loading resolutions...");
+      
+      // Show loading, hide others
+      loadingState.style.display = 'block';
+      errorState.style.display = 'none';
+      emptyState.style.display = 'none';
+      complaintsList.innerHTML = '';
+      
+      try {
+        let complaints = [];
+        
+        // Try to use farmer-functions.js first
+        if (typeof window.loadMyComplaints === 'function') {
+          console.log("Using loadMyComplaints from farmer-functions.js");
+          complaints = await window.loadMyComplaints();
+        } else {
+          // Fallback: Direct API call
+          console.log("Using direct API call fallback");
+          complaints = await fetchComplaintsDirectly();
+        }
+        
+        console.log(`✅ Loaded ${complaints.length} complaints`);
+        
+        // Check if we got valid data
+        if (!Array.isArray(complaints)) {
+          console.error("❌ Complaints is not an array:", complaints);
+          throw new Error("Invalid data received from server");
+        }
+        
+        // Hide loading
+        loadingState.style.display = 'none';
+        
+        // Check if empty
+        if (complaints.length === 0) {
+          emptyState.style.display = 'block';
+          return;
+        }
+        
+        // Render complaints
+        renderComplaints(complaints);
+        
+      } catch (error) {
+        console.error("❌ Failed to load resolutions:", error);
+        loadingState.style.display = 'none';
+        errorMessage.textContent = error.message || "Network error. Please check your connection.";
+        errorState.style.display = 'block';
+      }
+    }
+    
+    // ========== DIRECT API FALLBACK ==========
+    async function fetchComplaintsDirectly() {
+      console.log("🌐 Making direct API call to /api/complaints/me");
+      
+      try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          throw new Error("Not logged in");
+        }
+        
+        const token = await user.getIdToken();
+        
+        const response = await fetch("http://localhost:3000/api/complaints/me", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
+        console.log("API Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log("API Response data:", data);
+        return data;
+        
+      } catch (error) {
+        console.error("Direct API call failed:", error);
+        throw error;
+      }
+    }
+    
+    // ========== RENDER COMPLAINTS ==========
+    function renderComplaints(complaints) {
+      console.log("🎨 Rendering complaints...");
+      
+      if (!complaints || complaints.length === 0) {
+        complaintsList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>No Complaints Found</h3>
+            <p>You haven't submitted any complaints yet.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      
+      // Sort by date (newest first)
+      complaints.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+      
+      complaints.forEach((complaint, index) => {
+        // Format dates
+        const createdDate = new Date(complaint.createdAt || complaint.date);
+        const updatedDate = new Date(complaint.updatedAt || complaint.createdAt || complaint.date);
+        
+        // Status badge
+        const status = complaint.status || 'Open';
+        let statusClass = 'status-open';
+        if (status.toLowerCase().includes('progress')) statusClass = 'status-inprogress';
+        if (status.toLowerCase().includes('resolve')) statusClass = 'status-resolved';
+        if (status.toLowerCase().includes('pending')) statusClass = 'status-pending';
+        
+        // Resolution notes (if any)
+        const hasResolution = complaint.resolutionNotes && complaint.resolutionNotes.trim().length > 0;
+        
+        html += `
+          <div class="complaint-card">
+            <div class="complaint-header">
+              <div class="complaint-title">${index + 1}. ${escapeHtml(complaint.title || 'Untitled Complaint')}</div>
+              <div class="status-badge ${statusClass}">${status}</div>
+            </div>
+            
+            <div class="complaint-meta">
+              <span>📅 Submitted: ${createdDate.toLocaleDateString()}</span>
+              <span>🕐 ${createdDate.toLocaleTimeString()}</span>
+              <span>🆔 #${complaint._id ? complaint._id.substring(0, 8) : 'N/A'}</span>
+            </div>
+            
+            <div class="complaint-body">
+              <div class="complaint-message">
+                <strong>Your Message:</strong><br>
+                ${escapeHtml(complaint.message || 'No message provided')}
+              </div>
+            </div>
+            
+            ${hasResolution ? `
+              <div class="resolution-section">
+                <div class="resolution-header">
+                  <span>✅</span>
+                  <h3>Admin Response</h3>
+                </div>
+                <div class="resolution-content">
+                  ${escapeHtml(complaint.resolutionNotes)}
+                </div>
+                <div class="resolution-date">
+                  Last updated: ${updatedDate.toLocaleDateString()} at ${updatedDate.toLocaleTimeString()}
+                </div>
+              </div>
+            ` : `
+              <div style="text-align: center; padding: 15px; color: var(--muted); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px;">
+                ⏳ Waiting for admin response...
+                <div style="font-size: 12px; margin-top: 5px;">
+                  Admin will update this complaint soon
+                </div>
+              </div>
+            `}
+          </div>
+        `;
+      });
+      
+      complaintsList.innerHTML = html;
+    }
+    
+    // ========== HELPER FUNCTIONS ==========
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        console.log("🔄 Auto-refreshing resolutions...");
+        loadResolutions();
+      }
+    }, 30000);
+    
+    console.log("✅ Resolutions page script ready!");
+  </script>
+</body>
+</html>

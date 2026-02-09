@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriLite • Smart Farmer System</title>
+  <style>
+    :root{
+      --bg:#070b14; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.12);
+      --text:#eaf2ff; --muted:rgba(234,242,255,.75);
+      --blue:#2d6cdf; --blue2:#58a6ff; --danger:#ff8a8a;
+      --shadow:0 18px 44px rgba(0,0,0,.55);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Segoe UI,Arial; color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(1000px 520px at 18% 10%, rgba(88,166,255,.18), transparent 60%),
+        radial-gradient(900px 520px at 82% 30%, rgba(45,108,223,.16), transparent 55%),
+        linear-gradient(180deg, #050812, #070b14 45%, #070b14);
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 22px;
+      background:rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(10px);
+    }
+    .brand{font-weight:900; letter-spacing:.2px}
+    .brand small{display:block; font-weight:700; color:var(--muted); letter-spacing:0; margin-top:4px}
+    .wrap{max-width:1100px;margin:0 auto;padding:22px}
+    .hero{
+      display:grid; grid-template-columns:1.2fr .8fr; gap:16px; align-items:stretch;
+    }
+    .card{
+      background:var(--card); border:1px solid var(--line);
+      border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0 0 8px; font-size:1.7rem}
+    p{margin:0; color:var(--muted); line-height:1.5}
+    .actions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+    .btn{
+      padding:12px 14px; border-radius:12px; border:0; cursor:pointer;
+      font-weight:900; color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+      min-width:160px;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .btn.outline{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+    }
+    .grid3{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:16px}
+    .kpi{padding:14px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10)}
+    .kpi b{display:block; font-size:1.05rem}
+    .kpi span{color:var(--muted); font-size:.92rem}
+    footer{padding:18px 22px; color:var(--muted); text-align:center}
+    @media (max-width:900px){ .hero{grid-template-columns:1fr} .grid3{grid-template-columns:1fr} }
+
+    /* Modal (popups) */
+    .modalBack{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; padding:16px; z-index:50}
+    .modal{
+      width:440px; max-width:95vw;
+      background:rgba(10,14,26,.92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.65);
+      padding:16px;
+    }
+    .mHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .mTitle{font-weight:900}
+    .mClose{border:0; background:transparent; color:var(--muted); font-size:20px; cursor:pointer}
+    .mBody{color:var(--muted); margin-top:8px; line-height:1.45}
+    .mBtns{display:flex; gap:10px; justify-content:flex-end; margin-top:14px}
+    .mBtn{border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:900}
+    .mBtn.primary{background:linear-gradient(135deg,var(--blue),var(--blue2)); border:0}
+    .mBtn.danger{background:rgba(255,138,138,.12); border:1px solid rgba(255,138,138,.35); color:#ffb3b3}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      AgriLite • Smart Farmer System
+      <small>Firebase Auth + MongoDB (Crops, Inventory, Complaints, Feedback)</small>
+    </div>
+    <div class="actions">
+      <a class="btn outline" href="user_panel/login.html">Farmer Login</a>
+      <a class="btn" href="admin_panel/login.html">Admin Login</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="card">
+        <h1>Manage crops, inventory & support — in one place.</h1>
+        <p>
+          Farmers can add crops, view inventory, submit complaints and feedback.
+          Admin can manage inventory, resolve complaints, and monitor feedback.
+        </p>
+
+        <div class="actions">
+          <a class="btn" href="user_panel/signup.html">Create Farmer Account</a>
+          <button class="btn outline" id="aboutBtn">What can I do here?</button>
+        </div>
+
+        <div class="grid3">
+          <div class="kpi"><b>Farmer</b><span>Crops + Inventory + Complaints + Feedback</span></div>
+          <div class="kpi"><b>Admin</b><span>Inventory CRUD + Complaint Updates</span></div>
+          <div class="kpi"><b>Secure</b><span>Firebase Authentication</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 8px">Quick Actions</h2>
+        <p>Use these to test your system faster.</p>
+        <div class="actions" style="margin-top:12px">
+          <a class="btn outline" href="user_panel/dashboard.html">Open Farmer Dashboard</a>
+          <a class="btn outline" href="admin_panel/dashboard.html">Open Admin Dashboard</a>
+        </div>
+        <p style="margin-top:12px">
+          Tip: If dashboard asks login, login first.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer>© AgriLite • Built for TYIT Real-Time Database Project</footer>
+
+  <!-- Popup Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="mHead">
+        <div class="mTitle" id="mTitle">Message</div>
+        <button class="mClose" id="mClose">×</button>
+      </div>
+      <div class="mBody" id="mBody"></div>
+      <div class="mBtns" id="mBtns"></div>
+    </div>
+  </div>
+
+  <script>
+    const modalBack=document.getElementById("modalBack");
+    const mTitle=document.getElementById("mTitle");
+    const mBody=document.getElementById("mBody");
+    const mBtns=document.getElementById("mBtns");
+    document.getElementById("mClose").onclick=()=>modalBack.style.display="none";
+
+    function popup({title="Message", message="", buttons=[{text:"OK", type:"primary"}]}) {
+      mTitle.textContent = title;
+      mBody.textContent  = message;
+      mBtns.innerHTML = "";
+      buttons.forEach(b=>{
+        const btn=document.createElement("button");
+        btn.className="mBtn " + (b.type||"");
+        btn.textContent=b.text||"OK";
+        btn.onclick=()=>{ if(b.onClick) b.onClick(); modalBack.style.display="none"; };
+        mBtns.appendChild(btn);
+      });
+      modalBack.style.display="flex";
+    }
+
+    // Welcome popup once
+    if(sessionStorage.getItem("homeWelcomed")!=="1"){
+      sessionStorage.setItem("homeWelcomed","1");
+      popup({
+        title:"Welcome 👋",
+        message:"Choose Farmer Login/Signup or Admin Login to manage the system.",
+        buttons:[{text:"OK", type:"primary"}]
+      });
+    }
+
+    document.getElementById("aboutBtn").onclick=()=>{
+      popup({
+        title:"Features",
+        message:"Farmer: add crops, view inventory, send complaints & feedback. Admin: manage inventory, update complaint status with resolution notes, view feedback.",
+        buttons:[{text:"Nice", type:"primary"}]
+      });
+    };
+  </script>
+</body>
+</html>

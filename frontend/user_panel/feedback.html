@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farmer - Feedback</title>
+  <style>
+    :root {
+      --card: rgba(255, 255, 255, .06);
+      --line: rgba(255, 255, 255, .12);
+      --text: #eaf2ff;
+      --muted: rgba(234, 242, 255, .75);
+      --blue: #2d6cdf;
+      --blue2: #58a6ff;
+      --danger: #ff8a8a;
+      --shadow: 0 18px 44px rgba(0, 0, 0, .45);
+      --radius: 16px;
+      --primary: #2d6cdf;
+      --primary-light: #58a6ff;
+      --background: #0a0e1a;
+      --border: rgba(255, 255, 255, 0.1);
+      --success: #00d68f;
+      --warning: #ffaa00;
+      --error: #ff4757;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background: 
+        radial-gradient(1100px 600px at 20% 10%, rgba(88, 166, 255, .14), transparent 60%),
+        radial-gradient(900px 520px at 80% 30%, rgba(45, 108, 223, .12), transparent 55%),
+        linear-gradient(180deg, #050812, #070b14 55%, #070b14);
+    }
+    
+    /* ========== NAVIGATION BAR ========== */
+    .navbar {
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0 30px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+    }
+    
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      font-size: 28px;
+    }
+    
+    .brand-text {
+      font-size: 22px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 12px;
+    }
+    
+    .nav-item {
+      display: flex;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      text-decoration: none;
+      color: #8ab4ff;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
+    }
+    
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: #8ab4ff;
+    }
+    
+    .logout-btn {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(231, 76, 60, 0.2);
+    }
+    
+    /* ========== MAIN CONTENT ========== */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-header p {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      color: var(--text);
+    }
+    
+    .card p {
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    select, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .07);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    select:focus, textarea:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, .2);
+    }
+    
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 0;
+      background: linear-gradient(135deg, #2d6cdf, #58a6ff);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 108, 223, .3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Feedback History */
+    .history-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      margin-top: 20px;
+    }
+    
+    .feedback-item {
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.3s;
+    }
+    
+    .feedback-item:hover {
+      background: rgba(255, 255, 255, .05);
+      border-color: rgba(88, 166, 255, .2);
+    }
+    
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .feedback-date {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    
+    .feedback-rating {
+      color: #ffaa00;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .feedback-message {
+      color: var(--text);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--blue);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Alert */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease;
+      max-width: 400px;
+    }
+    
+    .alert-success {
+      background: rgba(0, 214, 143, 0.15);
+      border: 1px solid rgba(0, 214, 143, 0.3);
+      color: #00d68f;
+    }
+    
+    .alert-error {
+      background: rgba(255, 71, 87, 0.15);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: #ff4757;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 15px;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .page-header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== NAVIGATION BAR ========== -->
+  <div class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="logo">🌾</span>
+        <span class="brand-text">Smart Farmer</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="inventory.html" class="nav-link">
+            <span>📦</span> Inventory
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="complaints.html" class="nav-link">
+            <span>📝</span> Complaints
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="feedback.html" class="nav-link active">
+            <span>⭐</span> Feedback
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="view_reverts.html" class="nav-link">
+            <span>✅</span> Resolutions
+          </a>
+        </li>
+      </ul>
+      
+      <div class="nav-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userInitial">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Farmer</div>
+          </div>
+        </div>
+        
+        <button class="logout-btn" id="logoutBtn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>⭐ Share Your Feedback</h1>
+      <p>Your feedback helps us improve our services. Share your experience, suggestions, or any issues you've encountered.</p>
+    </div>
+
+    <!-- Submit Feedback Card -->
+    <div class="card">
+      <h2>📤 Submit Feedback</h2>
+      <p>Tell us about your experience with Smart Farmer platform</p>
+
+      <div class="form-group">
+        <label for="rating">Rating</label>
+        <select id="rating">
+          <option value="5">⭐ ⭐ ⭐ ⭐ ⭐ - Excellent</option>
+          <option value="4">⭐ ⭐ ⭐ ⭐ ☆ - Good</option>
+          <option value="3" selected>⭐ ⭐ ⭐ ☆ ☆ - Okay</option>
+          <option value="2">⭐ ⭐ ☆ ☆ ☆ - Bad</option>
+          <option value="1">⭐ ☆ ☆ ☆ ☆ - Very Bad</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message *</label>
+        <textarea id="message" placeholder="Write your detailed feedback here…" required></textarea>
+      </div>
+
+      <button class="btn" id="sendBtn">Submit Feedback</button>
+    </div>
+
+    <!-- Feedback History Card -->
+    <div class="history-card">
+      <h2>📋 Your Feedback History</h2>
+      <p>View all feedback you've submitted previously</p>
+      
+      <div id="feedbackHistory">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Loading your feedback history...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <!-- Load farmer-logic.js (which has feedback functions) -->
+  <script src="../js/farmer-logic.js"></script>
+
+  <script>
+    console.log("⭐ Feedback page loading...");
+    
+    // DOM Elements
+    const sendBtn = document.getElementById('sendBtn');
+    const ratingSelect = document.getElementById('rating');
+    const messageTextarea = document.getElementById('message');
+    const feedbackHistory = document.getElementById('feedbackHistory');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userNameEl = document.getElementById('userName');
+    const userInitialEl = document.getElementById('userInitial');
+    
+    // Helper function to show alerts
+    function showAlert(message, type = 'success') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+          if (alertDiv.parentNode) {
+            document.body.removeChild(alertDiv);
+          }
+        }, 300);
+      }, 3000);
+    }
+    
+    // Helper to display feedback history
+    function displayFeedbackHistory(feedbackList) {
+      if (!feedbackList || feedbackList.length === 0) {
+        feedbackHistory.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>No Feedback Yet</h3>
+            <p>You haven't submitted any feedback yet. Your feedback will appear here once submitted.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      feedbackList.forEach(feedback => {
+        const date = new Date(feedback.createdAt || feedback.date || Date.now());
+        const formattedDate = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        const stars = '★'.repeat(feedback.rating || 5) + '☆'.repeat(5 - (feedback.rating || 5));
+        
+        html += `
+          <div class="feedback-item">
+            <div class="feedback-header">
+              <span class="feedback-date">${formattedDate}</span>
+              <span class="feedback-rating">${stars}</span>
+            </div>
+            <div class="feedback-message">${escapeHtml(feedback.message)}</div>
+          </div>
+        `;
+      });
+      
+      feedbackHistory.innerHTML = html;
+    }
+    
+    // Helper to escape HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Update user info
+    function updateUserInfo(user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      userNameEl.textContent = displayName;
+      userInitialEl.textContent = displayName.charAt(0).toUpperCase();
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("🎯 Feedback page initialized");
+      
+      // Check if user is logged in
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          console.warn("⚠️ No user logged in, redirecting...");
+          window.location.href = "login.html";
+        } else {
+          console.log("✅ User logged in:", user.email);
+          updateUserInfo(user);
+          
+          console.log("🔍 Checking feedback functions...");
+          console.log("  - addFeedback:", typeof window.addFeedback);
+          console.log("  - loadMyFeedback:", typeof window.loadMyFeedback);
+          
+          if (typeof window.addFeedback === 'function' && typeof window.loadMyFeedback === 'function') {
+            console.log("✅ All feedback functions are available");
+            setupEventListeners();
+            loadFeedbackHistory();
+          } else {
+            console.error("❌ Feedback functions missing!");
+            feedbackHistory.innerHTML = `
+              <div style="color: var(--error); padding: 20px; text-align: center; background: rgba(255, 71, 87, 0.1); border-radius: 8px;">
+                <h3>⚠️ Functions Not Available</h3>
+                <p>Feedback functions not loaded. Please check if farmer-logic.js is properly loaded.</p>
+                <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                  🔄 Reload Page
+                </button>
+              </div>
+            `;
+          }
+        }
+      });
+    });
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Submit feedback button
+      sendBtn.addEventListener("click", async () => {
+        const rating = ratingSelect.value;
+        const message = messageTextarea.value.trim();
+        
+        if (!message) {
+          showAlert("Please write some feedback before submitting", 'error');
+          messageTextarea.focus();
+          return;
+        }
+        
+        // Disable button during submission
+        sendBtn.disabled = true;
+        const originalText = sendBtn.textContent;
+        sendBtn.textContent = "Submitting...";
+        
+        try {
+          console.log("📤 Submitting feedback...");
+          
+          // Use the function from farmer-logic.js
+          const result = await window.addFeedback({ rating, message });
+          console.log("✅ Submission result:", result);
+          
+          // Clear form
+          messageTextarea.value = "";
+          
+          // Show success message
+          showAlert("✅ Feedback submitted successfully!", 'success');
+          
+          // Reload history
+          loadFeedbackHistory();
+          
+        } catch (error) {
+          console.error("❌ Error submitting feedback:", error);
+          showAlert(error.message || "Failed to submit feedback", 'error');
+          
+        } finally {
+          sendBtn.disabled = false;
+          sendBtn.textContent = originalText;
+        }
+      });
+      
+      // Logout button
+      logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (confirm("Are you sure you want to logout?")) {
+          if (typeof window.logout === 'function') {
+            window.logout("../index.html");
+          } else {
+            firebase.auth().signOut()
+              .then(() => {
+                window.location.href = "../index.html";
+              })
+              .catch((error) => {
+                console.error("Logout error:", error);
+                window.location.href = "../index.html";
+              });
+          }
+        }
+      });
+      
+      // Enter key support for message textarea
+      messageTextarea.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.ctrlKey) {
+          e.preventDefault();
+          sendBtn.click();
+        }
+      });
+    }
+    
+    // Load feedback history
+    async function loadFeedbackHistory() {
+      try {
+        console.log("📋 Loading feedback history...");
+        
+        feedbackHistory.innerHTML = `
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading your feedback history...</p>
+          </div>
+        `;
+        
+        const feedbackList = await window.loadMyFeedback();
+        console.log(`✅ Loaded ${feedbackList.length} feedback items`);
+        
+        displayFeedbackHistory(feedbackList);
+        
+      } catch (error) {
+        console.error("❌ Error loading feedback history:", error);
+        feedbackHistory.innerHTML = `
+          <div style="color: var(--error); padding: 20px; text-align: center; background: rgba(255, 71, 87, 0.1); border-radius: 8px;">
+            <h3>⚠️ Error Loading Feedback</h3>
+            <p>${error.message || "Failed to load feedback history"}</p>
+            <button onclick="loadFeedbackHistory()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">
+              🔄 Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+    
+    console.log("✅ Feedback page script loaded");
+  </script>
+</body>
+</html>

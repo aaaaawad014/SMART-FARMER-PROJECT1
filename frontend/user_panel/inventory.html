@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farmer - Inventory</title>
+  <style>
+    :root{
+      --card:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.12);
+      --text:#eaf2ff;
+      --muted:rgba(234,242,255,.75);
+      --blue:#2d6cdf;
+      --blue2:#58a6ff;
+      --danger:#ff8a8a;
+      --shadow:0 18px 44px rgba(0,0,0,.45);
+      --radius:16px;
+      --primary: #2d6cdf;
+      --primary-light: #58a6ff;
+      --background: #0a0e1a;
+      --border: rgba(255, 255, 255, 0.1);
+      --success: #00d68f;
+      --warning: #ffaa00;
+      --error: #ff4757;
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    body{
+      font-family:Segoe UI,Arial;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(1100px 600px at 20% 10%, rgba(88,166,255,.14), transparent 60%),
+        radial-gradient(900px 520px at 80% 30%, rgba(45,108,223,.12), transparent 55%),
+        linear-gradient(180deg,#050812,#070b14 55%,#070b14)
+    }
+    
+    /* ========== NAVIGATION BAR ========== */
+    .navbar {
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0 30px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+    }
+    
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      font-size: 28px;
+    }
+    
+    .brand-text {
+      font-size: 22px;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 12px;
+    }
+    
+    .nav-item {
+      display: flex;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      text-decoration: none;
+      color: #8ab4ff;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      box-shadow: 0 4px 15px rgba(45, 108, 223, 0.3);
+    }
+    
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: #8ab4ff;
+    }
+    
+    .logout-btn {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(231, 76, 60, 0.2);
+    }
+    
+    /* ========== MAIN CONTENT ========== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-header p {
+      color: var(--muted);
+      font-size: 16px;
+    }
+    
+    /* Cards */
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      margin:0 0 10px;
+      font-size:22px;
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card p {
+      color:var(--muted);
+      margin-bottom:15px;
+      font-size: 14px;
+    }
+    
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:15px;
+    }
+    input{
+      flex:1;
+      min-width:240px;
+      padding:12px 15px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input::placeholder{
+      color:rgba(234,242,255,.5);
+    }
+    .btn{
+      padding:12px 20px;
+      border-radius:12px;
+      border:0;
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+      font-size:14px;
+      transition:all 0.3s;
+    }
+    .btn:hover{
+      filter:brightness(1.1);
+      transform:translateY(-2px);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+    }
+    th,td{
+      padding:12px 15px;
+      border-bottom:1px solid rgba(255,255,255,.1);
+      text-align:left;
+    }
+    th{
+      color:var(--muted);
+      font-weight:600;
+      font-size:14px;
+      background:rgba(255,255,255,.05);
+    }
+    .right{text-align:right}
+    .pill{
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:14px;
+    }
+    
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #8ab4ff;
+    }
+    
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+    
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    /* modal */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.62);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:50
+    }
+    .modal{
+      width:440px;
+      max-width:95vw;
+      background:rgba(10,14,26,.92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.65);
+      padding:20px
+    }
+    .mHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:15px;
+    }
+    .mTitle{
+      font-weight:900;
+      font-size:18px;
+    }
+    .mClose{
+      border:0;
+      background:transparent;
+      color:var(--muted);
+      font-size:24px;
+      cursor:pointer;
+      width:30px;
+      height:30px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .mBody{
+      color:var(--muted);
+      line-height:1.5;
+      margin-bottom:20px;
+    }
+    .mBtns{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .mBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 20px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+    }
+    .mBtn.primary{
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      border:0;
+    }
+    .mBtn.danger{
+      background:rgba(255,138,138,.12);
+      border:1px solid rgba(255,138,138,.35);
+      color:#ffb3b3;
+    }
+    
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 15px;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .row {
+        flex-direction: column;
+      }
+      input {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== NAVIGATION BAR ========== -->
+  <div class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="logo">🌾</span>
+        <span class="brand-text">Smart Farmer</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="inventory.html" class="nav-link active">
+            <span>📦</span> Inventory
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="complaints.html" class="nav-link">
+            <span>📝</span> Complaints
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="feedback.html" class="nav-link">
+            <span>⭐</span> Feedback
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="view_reverts.html" class="nav-link">
+            <span>✅</span> Resolutions
+          </a>
+        </li>
+      </ul>
+      
+      <div class="nav-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userInitial">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Farmer</div>
+          </div>
+        </div>
+        
+        <button class="logout-btn" id="logoutBtn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>📦 Available Inventory</h1>
+      <p>Browse items added by admin. These items are available for purchase or use.</p>
+    </div>
+    
+    <div class="card">
+      <h2><span>📋</span> Inventory Items</h2>
+      <p>Search and view all available agricultural items</p>
+
+      <div class="row">
+        <input id="search" placeholder="🔍 Search by item name or category…"/>
+        <button class="btn" id="reloadBtn">🔄 Refresh Inventory</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th class="right">Price</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="5" class="loading">
+                ⏳ Loading inventory items...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- modal -->
+<div class="modalBack" id="modalBack">
+  <div class="modal">
+    <div class="mHead">
+      <div class="mTitle" id="mTitle">Message</div>
+      <button class="mClose" id="mClose">×</button>
+    </div>
+    <div class="mBody" id="mBody"></div>
+    <div class="mBtns" id="mBtns"></div>
+  </div>
+</div>
+
+<!-- SIMPLIFIED SCRIPTS - NO ERRORS -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<!-- INLINE FIX SCRIPT -->
+<script>
+  // ========== SIMPLE FIX SCRIPT ==========
+  console.log("🔧 Inventory Page - Simple Fix");
+  
+  // Wait for Firebase
+  setTimeout(() => {
+    console.log("✅ Firebase loaded");
+    
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCeScZUZii7ef6Ou_Hptv_gSqnPASOMXVk",
+      authDomain: "smartfarmersystem-5c9ee.firebaseapp.com",
+      databaseURL: "https://smartfarmersystem-5c9ee-default-rtdb.firebaseio.com",
+      projectId: "smartfarmersystem-5c9ee",
+      storageBucket: "smartfarmersystem-5c9ee.firebasestorage.app",
+      messagingSenderId: "814146849558",
+      appId: "1:814146849558:web:4391c0c2960321d17cde37",
+      measurementId: "G-KNDV2VDCE4"
+    };
+    
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase initialized");
+    }
+    
+    // Now start the page
+    startInventoryPage();
+  }, 1000);
+  
+  function startInventoryPage() {
+    console.log("🚀 Starting inventory page...");
+    
+    // DOM Elements
+    const modalBack = document.getElementById("modalBack");
+    const mTitle = document.getElementById("mTitle");
+    const mBody = document.getElementById("mBody");
+    const mBtns = document.getElementById("mBtns");
+    const tbody = document.getElementById("tbody");
+    const searchInput = document.getElementById("search");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userNameEl = document.getElementById('userName');
+    const userInitialEl = document.getElementById('userInitial');
+    
+    let allItems = [];
+    
+    // Update user info
+    function updateUserInfo(user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      if (userNameEl) userNameEl.textContent = displayName;
+      if (userInitialEl) userInitialEl.textContent = displayName.charAt(0).toUpperCase();
+    }
+    
+    // ========== CHECK LOGIN ==========
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        console.log("❌ Not logged in, redirecting...");
+        window.location.href = "login.html";
+      } else {
+        console.log(`✅ User logged in: ${user.email}`);
+        updateUserInfo(user);
+        initializePage();
+      }
+    });
+    
+    // ========== MODAL FUNCTIONS ==========
+    if (document.getElementById("mClose")) {
+      document.getElementById("mClose").onclick = () => {
+        modalBack.style.display = "none";
+      };
+    }
+    
+    function showModal({title = "Message", message = "", buttons = [{text: "OK", type: "primary"}]}) {
+      if (!mTitle || !mBody || !mBtns) {
+        alert(`${title}: ${message}`);
+        return;
+      }
+      
+      mTitle.textContent = title;
+      mBody.textContent = message;
+      mBtns.innerHTML = "";
+      
+      buttons.forEach(b => {
+        const btn = document.createElement("button");
+        btn.className = "mBtn " + (b.type || "");
+        btn.textContent = b.text || "OK";
+        btn.onclick = () => {
+          if (b.onClick) b.onClick();
+          modalBack.style.display = "none";
+        };
+        mBtns.appendChild(btn);
+      });
+      
+      modalBack.style.display = "flex";
+    }
+    
+    // ========== LOGOUT ==========
+    if (logoutBtn) {
+      logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        showModal({
+          title: "Logout?",
+          message: "Do you want to logout now?",
+          buttons: [
+            { text: "Cancel" },
+            { 
+              text: "Logout", 
+              type: "danger", 
+              onClick: () => {
+                firebase.auth().signOut().then(() => {
+                  window.location.href = "../index.html";
+                });
+              }
+            }
+          ]
+        });
+      };
+    }
+    
+    // ========== INVENTORY FUNCTIONS ==========
+    async function loadInventory() {
+      console.log("📦 Loading inventory...");
+      
+      try {
+        // Show loading
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="loading">
+              ⏳ Loading inventory from server...
+            </td>
+          </tr>
+        `;
+        
+        // Get current user
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          throw new Error("Please login first");
+        }
+        
+        console.log(`👤 User: ${user.email}`);
+        
+        // Get Firebase token
+        const token = await user.getIdToken();
+        console.log("✅ Got Firebase token");
+        
+        // Call API
+        const response = await fetch("http://localhost:3000/api/inventory", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
+        console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`✅ Got ${Array.isArray(data) ? data.length : 0} items`);
+        
+        // Store and display
+        allItems = Array.isArray(data) ? data : [];
+        renderInventory(allItems);
+        
+        if (allItems.length === 0) {
+          showModal({
+            title: "Inventory Empty",
+            message: "Admin has not added any items yet.",
+            buttons: [{ text: "OK", type: "primary" }]
+          });
+        }
+        
+      } catch (error) {
+        console.error("❌ Failed to load inventory:", error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="error">
+              ❌ Error: ${error.message}
+              <br><br>
+              <button onclick="loadInventory()" class="btn" style="margin-top:10px;">
+                🔄 Try Again
+              </button>
+            </td>
+          </tr>
+        `;
+        
+        showModal({
+          title: "Load Failed",
+          message: error.message,
+          buttons: [{ text: "OK", type: "danger" }]
+        });
+      }
+    }
+    
+    function renderInventory(items) {
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <h3>No Items Found</h3>
+              <p>Admin hasn't added any inventory items yet.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      let html = '';
+      items.forEach(item => {
+        // Escape HTML to prevent XSS
+        const itemName = escapeHtml(item.itemName || item.name || "-");
+        const category = escapeHtml(item.category || "General");
+        const quantity = Number(item.availableQty ?? item.qty ?? 0);
+        const unit = escapeHtml(item.unit || "kg");
+        const price = Number(item.price || 0);
+        
+        html += `
+          <tr>
+            <td><span class="pill">${itemName}</span></td>
+            <td>${category}</td>
+            <td>${quantity}</td>
+            <td>${unit}</td>
+            <td class="right">₹${price}</td>
+          </tr>
+        `;
+      });
+      
+      tbody.innerHTML = html;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // ========== SEARCH FUNCTION ==========
+    function setupSearch() {
+      if (!searchInput) return;
+      
+      searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        
+        if (!query) {
+          renderInventory(allItems);
+          return;
+        }
+        
+        const filtered = allItems.filter(item => {
+          const name = (item.itemName || item.name || "").toLowerCase();
+          const category = (item.category || "").toLowerCase();
+          return name.includes(query) || category.includes(query);
+        });
+        
+        renderInventory(filtered);
+      });
+    }
+    
+    // ========== INITIALIZE PAGE ==========
+    function initializePage() {
+      console.log("🎯 Initializing page components...");
+      
+      // Setup reload button
+      if (reloadBtn) {
+        reloadBtn.onclick = loadInventory;
+      }
+      
+      // Setup search
+      setupSearch();
+      
+      // Load inventory immediately
+      loadInventory();
+    }
+    
+    console.log("✅ Inventory page ready!");
+  }
+</script>
+</body>
+</html>

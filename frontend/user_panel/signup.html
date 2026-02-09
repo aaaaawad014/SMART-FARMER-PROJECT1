@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farmer Sign Up</title>
+  <style>
+    :root{
+      --bg:#070b14; 
+      --card:rgba(255,255,255,.06); 
+      --line:rgba(255,255,255,.12);
+      --text:#eaf2ff; 
+      --muted:rgba(234,242,255,.75);
+      --blue:#2d6cdf; 
+      --blue2:#58a6ff; 
+      --danger:#ff8a8a;
+      --shadow:0 18px 44px rgba(0,0,0,.55);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; 
+      font-family:Segoe UI,Arial; 
+      color:var(--text);
+      min-height:100vh; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(88,166,255,.18), transparent 60%),
+        radial-gradient(700px 420px at 80% 30%, rgba(45,108,223,.16), transparent 55%),
+        linear-gradient(180deg, #050812, #070b14 45%, #070b14);
+      padding:20px;
+    }
+    .card{
+      width:420px; 
+      background:var(--card); 
+      border:1px solid var(--line);
+      border-radius:var(--radius); 
+      padding:22px; 
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0 0 6px; font-size:1.35rem}
+    .sub{margin:0 0 18px; color:var(--muted); font-size:.95rem}
+    label{display:block; color:var(--muted); font-size:.9rem; margin:10px 0 6px}
+    input{
+      width:100%; 
+      padding:12px 12px; 
+      border-radius:12px;
+      border:1px solid var(--line); 
+      background:rgba(255,255,255,.07);
+      color:var(--text); 
+      outline:none;
+    }
+    input:focus{border-color:rgba(88,166,255,.65)}
+    .btn{
+      width:100%; 
+      margin-top:14px; 
+      padding:12px 14px;
+      border:0; 
+      border-radius:12px; 
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:#fff; 
+      font-weight:800; 
+      cursor:pointer;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .row{display:flex; justify-content:space-between; margin-top:14px; gap:10px}
+    a{color:#8ab4ff; text-decoration:none; font-weight:600}
+    a:hover{text-decoration:underline}
+
+    /* Modal */
+    .modalBack{
+      position:fixed; 
+      inset:0; 
+      background:rgba(0,0,0,.62); 
+      display:none; 
+      align-items:center; 
+      justify-content:center; 
+      padding:16px;
+      z-index:1000;
+    }
+    .modal{
+      width:420px; 
+      max-width:95vw;
+      background:rgba(10,14,26,.92); 
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px; 
+      box-shadow:0 20px 60px rgba(0,0,0,.65);
+      padding:16px;
+    }
+    .mHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .mTitle{font-weight:900}
+    .mClose{border:0; background:transparent; color:var(--muted); font-size:20px; cursor:pointer}
+    .mBody{color:var(--muted); margin-top:8px; line-height:1.4}
+    .mBtns{display:flex; gap:10px; justify-content:flex-end; margin-top:14px}
+    .mBtn{
+      border:1px solid rgba(255,255,255,.14); 
+      background:rgba(255,255,255,.06); 
+      color:var(--text); 
+      padding:10px 12px; 
+      border-radius:12px; 
+      cursor:pointer; 
+      font-weight:800;
+    }
+    .mBtn.primary{background:linear-gradient(135deg,var(--blue),var(--blue2)); border:0}
+    .mBtn.danger{background:rgba(255,138,138,.12); border:1px solid rgba(255,138,138,.35); color:#ffb3b3}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Create Farmer Account</h1>
+    <p class="sub">Secure signup with Firebase Authentication.</p>
+
+    <label>Full Name</label>
+    <input id="name" placeholder="e.g. Awad Ansari"/>
+
+    <label>Email</label>
+    <input id="email" placeholder="example@gmail.com"/>
+
+    <label>Password</label>
+    <input id="pass" type="password" placeholder="Minimum 6 characters"/>
+
+    <button class="btn" id="signupBtn">Sign Up</button>
+
+    <div class="row">
+      <a href="login.html">Already have an account?</a>
+      <a href="../index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="mHead">
+        <div class="mTitle" id="mTitle">Message</div>
+        <button class="mClose" id="mClose">×</button>
+      </div>
+      <div class="mBody" id="mBody"></div>
+      <div class="mBtns" id="mBtns"></div>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    // ========== POPUP SYSTEM ==========
+    const modalBack = document.getElementById("modalBack");
+    const mTitle = document.getElementById("mTitle");
+    const mBody = document.getElementById("mBody");
+    const mBtns = document.getElementById("mBtns");
+    const mClose = document.getElementById("mClose");
+    
+    mClose.onclick = () => {
+      modalBack.style.display = "none";
+    };
+    
+    function popup({title = "Message", message = "", buttons = [{text: "OK", type: "primary"}]}) {
+      console.log("📢 Popup:", title, message);
+      mTitle.textContent = title;
+      mBody.textContent = message;
+      mBtns.innerHTML = "";
+      
+      buttons.forEach(btn => {
+        const button = document.createElement("button");
+        button.className = "mBtn " + (btn.type || "");
+        button.textContent = btn.text || "OK";
+        button.onclick = () => {
+          if (btn.onClick) btn.onClick();
+          modalBack.style.display = "none";
+        };
+        mBtns.appendChild(button);
+      });
+      
+      modalBack.style.display = "flex";
+    }
+
+    // ========== SIGNUP FUNCTION ==========
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+      console.log("🚀 Signup button clicked");
+      
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("pass").value.trim();
+
+      // Validation
+      if (!name || !email || !password) {
+        popup({
+          title: "Missing Fields",
+          message: "Please fill in all fields.",
+          buttons: [{text: "OK", type: "primary"}]
+        });
+        return;
+      }
+
+      if (password.length < 6) {
+        popup({
+          title: "Weak Password",
+          message: "Password must be at least 6 characters.",
+          buttons: [{text: "OK", type: "primary"}]
+        });
+        return;
+      }
+
+      try {
+        // Show loading
+        const btn = document.getElementById("signupBtn");
+        btn.disabled = true;
+        btn.textContent = "Creating Account...";
+
+        console.log("1. Creating Firebase user...");
+        
+        // 1. Create user in Firebase Authentication
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        console.log("✅ Firebase user created:", userCredential.user.uid);
+        
+        // Update display name
+        await userCredential.user.updateProfile({
+          displayName: name
+        });
+        
+        console.log("2. Waiting for Firebase sync...");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log("3. Saving to MongoDB...");
+        
+        // 2. Save user to MongoDB database
+        if (typeof window.upsertProfile === 'function') {
+          const mongoResult = await window.upsertProfile(name);
+          console.log("✅ MongoDB save result:", mongoResult);
+        } else {
+          console.error("❌ upsertProfile function not found!");
+        }
+        
+        // Success popup
+        popup({
+          title: "Account Created ✅",
+          message: "Your account has been created successfully! Redirecting to login...",
+          buttons: [{
+            text: "Go to Login",
+            type: "primary",
+            onClick: () => {
+              window.location.href = "login.html";
+            }
+          }]
+        });
+
+      } catch (error) {
+        console.error("❌ Signup error:", error);
+        
+        // Handle specific Firebase errors
+        let errorMessage = error.message;
+        if (error.code === 'auth/email-already-in-use') {
+          errorMessage = "This email is already registered. Please login instead.";
+        } else if (error.code === 'auth/invalid-email') {
+          errorMessage = "Invalid email address.";
+        } else if (error.code === 'auth/weak-password') {
+          errorMessage = "Password is too weak. Use at least 6 characters.";
+        }
+        
+        popup({
+          title: "Signup Failed ❌",
+          message: errorMessage,
+          buttons: [{text: "Try Again", type: "danger"}]
+        });
+        
+        // Reset button
+        const btn = document.getElementById("signupBtn");
+        btn.disabled = false;
+        btn.textContent = "Sign Up";
+      }
+    });
+
+    // ========== ENTER KEY SUPPORT ==========
+    document.addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        document.getElementById("signupBtn").click();
+      }
+    });
+
+    // ========== DEBUG: CHECK FUNCTIONS ==========
+    console.log("🔍 Checking available functions:");
+    console.log("- upsertProfile:", typeof window.upsertProfile);
+    console.log("- firebase.auth:", typeof firebase.auth);
+    console.log("- firebase.auth().currentUser:", firebase.auth().currentUser);
+  </script>
+</body>
+</html>

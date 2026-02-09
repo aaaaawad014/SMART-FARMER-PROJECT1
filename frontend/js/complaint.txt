@@ -1,0 +1,82 @@
+// complaint.js - Separate complaint functions
+console.log("📝 complaint.js loading...");
+
+const API_BASE = "http://localhost:3000";
+
+// Helper function to get auth token
+async function getComplaintAuthToken() {
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      console.warn("⚠️ No user logged in for complaints");
+      throw new Error("Please login first");
+    }
+    
+    const token = await user.getIdToken();
+    return token;
+  } catch (error) {
+    console.error("❌ Error getting complaint token:", error);
+    throw error;
+  }
+}
+
+// Submit a new complaint
+window.submitComplaint = async function(complaintData) {
+  console.log("📝 submitComplaint called with:", complaintData);
+  
+  try {
+    const token = await getComplaintAuthToken();
+    
+    const response = await fetch(API_BASE + "/api/complaints", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(complaintData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log("✅ Complaint submitted successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("❌ submitComplaint failed:", error);
+    throw error;
+  }
+};
+
+// Load user's complaints
+window.loadMyComplaints = async function() {
+  console.log("📋 loadMyComplaints called");
+  
+  try {
+    const token = await getComplaintAuthToken();
+    
+    const response = await fetch(API_BASE + "/api/complaints/me", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: Failed to load complaints`);
+    }
+    
+    const complaints = await response.json();
+    console.log(`✅ Loaded ${complaints.length} complaints`);
+    return complaints;
+  } catch (error) {
+    console.error("❌ loadMyComplaints failed:", error);
+    throw error;
+  }
+};
+
+console.log("✅ complaint.js loaded successfully!");
+console.log("📋 Available complaint functions:");
+console.log("  • submitComplaint:", typeof window.submitComplaint);
+console.log("  • loadMyComplaints:", typeof window.loadMyComplaints);

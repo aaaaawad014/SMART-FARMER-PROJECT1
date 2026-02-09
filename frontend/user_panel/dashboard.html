@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farmer - Dashboard</title>
+  
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e6f7ff;
+      min-height: 100vh;
+    }
+    
+    /* ========== NAVIGATION BAR ========== */
+    .navbar {
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+    }
+    
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo {
+      font-size: 28px;
+    }
+    
+    .brand-text {
+      font-size: 22px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 12px;
+    }
+    
+    .nav-item {
+      display: flex;
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      text-decoration: none;
+      color: #8ab4ff;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .nav-link.active {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+    
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: #8ab4ff;
+    }
+    
+    .logout-btn {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #e74c3c;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(231, 76, 60, 0.2);
+    }
+    
+    /* ========== MAIN CONTENT ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    /* Page Header */
+    .page-header {
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .page-header p {
+      color: #8ab4ff;
+      font-size: 16px;
+    }
+    
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+    
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card h2 {
+      color: #4facfe;
+      margin-bottom: 10px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card p {
+      color: #a6d5ff;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    /* Form Styles */
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      flex: 1;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #8ab4ff;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #e6f7ff;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+    }
+    
+    input::placeholder {
+      color: rgba(230, 247, 255, 0.5);
+    }
+    
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e6f7ff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(90deg, #ff6b6b 0%, #ff8e8e 100%);
+      color: white;
+      padding: 6px 15px;
+      font-size: 12px;
+    }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th {
+      text-align: left;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #8ab4ff;
+      font-weight: 600;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 14px;
+    }
+    
+    tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .navbar {
+        padding: 0 15px;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .form-row {
+        flex-direction: column;
+      }
+      
+      .container {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ========== NAVIGATION BAR ========== -->
+  <div class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="logo">🌾</span>
+        <span class="brand-text">Smart Farmer</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link active">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="inventory.html" class="nav-link">
+            <span>📦</span> Inventory
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="complaints.html" class="nav-link">
+            <span>📝</span> Complaints
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="feedback.html" class="nav-link">
+            <span>⭐</span> Feedback
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="view_reverts.html" class="nav-link">
+            <span>✅</span> Resolutions
+          </a>
+        </li>
+      </ul>
+      
+      <div class="nav-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userInitial">U</div>
+          <div class="user-details">
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-role">Farmer</div>
+          </div>
+        </div>
+        
+        <button class="logout-btn" id="logoutBtn">
+          <span>🚪</span> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>🌾 Farmer Dashboard</h1>
+      <p>Welcome back! Manage your crops, view inventory, and track your complaints from here.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-grid">
+      <!-- Crops Card -->
+      <div class="card">
+        <h2><span>🌱</span> My Crops</h2>
+        <p>Manage your crops stored in MongoDB database</p>
+        
+        <!-- Add Crop Form -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Crop Name *</label>
+            <input type="text" id="cropName" placeholder="e.g., Wheat, Rice, Corn">
+          </div>
+          <div class="form-group">
+            <label>Season *</label>
+            <input type="text" id="season" placeholder="e.g., Rabi, Kharif, Zaid">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Area (acres)</label>
+            <input type="number" id="area" placeholder="e.g., 5.2" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="quantity" placeholder="e.g., 100">
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="btn-group">
+          <button class="btn btn-primary" id="addCropBtn">
+            ➕ Add Crop
+          </button>
+          <button class="btn btn-secondary" id="refreshCropsBtn">
+            🔄 Refresh List
+          </button>
+        </div>
+        
+        <!-- Crops Table -->
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Crop</th>
+                <th>Season</th>
+                <th>Area</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="cropsBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: #8ab4ff; padding: 30px;">
+                  Loading crops...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Inventory Card -->
+      <div class="card">
+        <h2><span>📦</span> Inventory</h2>
+        <p>Items available from admin (loaded from MongoDB)</p>
+        
+        <!-- Search and Load -->
+        <div class="form-row">
+          <div style="flex: 1; position: relative;">
+            <input type="text" id="invSearch" placeholder="🔍 Search inventory items..." style="padding-left: 40px;">
+          </div>
+          <button class="btn btn-primary" id="loadInventoryBtn">
+            📥 Load Inventory
+          </button>
+        </div>
+        
+        <!-- Inventory Table -->
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="invBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: #8ab4ff; padding: 30px;">
+                  Click "Load Inventory" to view items
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT FILES -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/farmer-functions.js"></script>
+  
+  <!-- FIX INVENTORY SCRIPT -->
+  <script>
+    console.log("🔧 Dashboard Inventory Fix Loading...");
+
+    // Wait for Firebase and other scripts to load
+    setTimeout(() => {
+        console.log("✅ Scripts loaded, checking inventory functions...");
+        
+        // ========== FIX 1: Ensure loadInventory exists ==========
+        if (typeof window.loadInventory === 'undefined') {
+            console.warn("⚠️ loadInventory not found, creating it...");
+            
+            window.loadInventory = async function() {
+                console.log("📦 Loading inventory (fallback function)...");
+                
+                try {
+                    // Get current user
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
+                        throw new Error("Please login first");
+                    }
+                    
+                    console.log(`👤 User: ${user.email}`);
+                    
+                    // Get Firebase token
+                    const token = await user.getIdToken();
+                    
+                    // Call backend API
+                    const response = await fetch("http://localhost:3000/api/inventory", {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log(`✅ Got ${Array.isArray(data) ? data.length : 0} inventory items`);
+                    return Array.isArray(data) ? data : [];
+                    
+                } catch (error) {
+                    console.error("❌ Failed to load inventory:", error);
+                    throw error;
+                }
+            };
+            
+            console.log("✅ Created loadInventory function");
+        } else {
+            console.log("✅ loadInventory function already exists");
+        }
+        
+        // ========== FIX 2: Ensure requireLogin exists ==========
+        if (typeof window.requireLogin === 'undefined') {
+            console.warn("⚠️ requireLogin not found, creating it...");
+            
+            window.requireLogin = function(redirectUrl = "login.html") {
+                console.log("🔒 Checking login (fallback)...");
+                
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (!user) {
+                        console.log("❌ Not logged in, redirecting...");
+                        window.location.href = redirectUrl;
+                    } else {
+                        console.log(`✅ User logged in: ${user.email}`);
+                    }
+                });
+            };
+        }
+        
+        // ========== FIX 3: Ensure logout exists ==========
+        if (typeof window.logout === 'undefined') {
+            console.warn("⚠️ logout not found, creating it...");
+            
+            window.logout = async function(redirectUrl = "../index.html") {
+                try {
+                    console.log("🚪 Logging out...");
+                    await firebase.auth().signOut();
+                    window.location.href = redirectUrl;
+                } catch (error) {
+                    console.error("❌ Logout error:", error);
+                    window.location.href = redirectUrl;
+                }
+            };
+        }
+        
+        console.log("🔧 All fixes applied!");
+    }, 1000);
+  </script>
+
+  <!-- DASHBOARD MAIN SCRIPT -->
+  <script>
+    // ========== ENHANCED DASHBOARD CODE ==========
+    console.log("📱 Dashboard Enhanced Version");
+    
+    // Check all functions
+    console.log("🔍 Checking all functions:");
+    console.log("- addCrop:", typeof window.addCrop);
+    console.log("- loadCrops:", typeof window.loadCrops);
+    console.log("- loadInventory:", typeof window.loadInventory);
+    console.log("- requireLogin:", typeof window.requireLogin);
+    console.log("- logout:", typeof window.logout);
+    
+    // If loadInventory is missing, show error
+    if (typeof window.loadInventory === 'undefined') {
+        console.error("❌ CRITICAL: loadInventory not available!");
+        alert("Inventory functions not loaded. Please refresh (Ctrl+F5)");
+    }
+    
+    // ========== SETUP EVENT LISTENERS ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("🎯 Dashboard DOM loaded");
+        
+        // Require login
+        if (typeof window.requireLogin === 'function') {
+            requireLogin("login.html");
+        }
+        
+        // Setup buttons
+        setupDashboardButtons();
+        
+        // Load initial data
+        setTimeout(loadDashboardData, 1500);
+    });
+    
+    // Update user info function
+    function updateUserInfo(user) {
+        const displayName = user.displayName || user.email.split('@')[0];
+        document.getElementById('userName').textContent = displayName;
+        document.getElementById('userInitial').textContent = displayName.charAt(0).toUpperCase();
+    }
+    
+    function setupDashboardButtons() {
+        console.log("🔗 Setting up dashboard buttons...");
+        
+        // ADD CROP BUTTON
+        document.getElementById('addCropBtn').onclick = async function() {
+            console.log("➕ Add Crop clicked");
+            
+            const cropName = document.getElementById('cropName').value.trim();
+            const season = document.getElementById('season').value.trim();
+            const area = document.getElementById('area').value || 0;
+            const quantity = document.getElementById('quantity').value || 0;
+            
+            if (!cropName || !season) {
+                alert("❌ Please enter Crop Name and Season");
+                return;
+            }
+            
+            this.disabled = true;
+            const originalText = this.textContent;
+            this.textContent = "Adding...";
+            
+            try {
+                const result = await addCrop({
+                    cropName: cropName,
+                    season: season,
+                    area: parseFloat(area),
+                    quantity: parseInt(quantity)
+                });
+                
+                alert("✅ Crop added successfully!");
+                
+                // Clear form
+                document.getElementById('cropName').value = '';
+                document.getElementById('season').value = '';
+                document.getElementById('area').value = '';
+                document.getElementById('quantity').value = '';
+                
+                // Refresh list
+                await loadCropsTable();
+                
+            } catch (error) {
+                console.error("❌ Error:", error);
+                alert("❌ Failed: " + error.message);
+            } finally {
+                this.disabled = false;
+                this.textContent = originalText;
+            }
+        };
+        
+        // REFRESH CROPS BUTTON
+        document.getElementById('refreshCropsBtn').onclick = async function() {
+            console.log("🔄 Refreshing crops...");
+            await loadCropsTable();
+        };
+        
+        // LOAD INVENTORY BUTTON - FIXED VERSION
+        document.getElementById('loadInventoryBtn').onclick = async function() {
+            console.log("📦 Loading inventory (dashboard)...");
+            await loadInventoryTable();
+        };
+        
+        // LOGOUT BUTTON
+        document.getElementById('logoutBtn').onclick = function(e) {
+            e.preventDefault();
+            if (confirm("Are you sure you want to logout?")) {
+                if (typeof window.logout === 'function') {
+                    logout("../index.html");
+                } else {
+                    firebase.auth().signOut().then(() => {
+                        window.location.href = "../index.html";
+                    });
+                }
+            }
+        };
+    }
+    
+    // ========== LOAD INVENTORY TABLE ==========
+    let inventoryData = [];
+    
+    async function loadInventoryTable() {
+        console.log("📊 Loading inventory table...");
+        const tbody = document.getElementById('invBody');
+        const button = document.getElementById('loadInventoryBtn');
+        
+        try {
+            button.disabled = true;
+            button.textContent = "Loading...";
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: #8ab4ff;">
+                        ⏳ Loading inventory from server...
+                    </td>
+                </tr>
+            `;
+            
+            // Call the fixed function
+            inventoryData = await loadInventory();
+            console.log(`✅ Got ${inventoryData.length} inventory items`);
+            
+            if (!Array.isArray(inventoryData)) {
+                console.error("❌ inventoryData is not array:", inventoryData);
+                inventoryData = [];
+            }
+            
+            renderInventoryTable(inventoryData);
+            
+            // Show success message
+            if (inventoryData.length > 0) {
+                alert(`✅ Loaded ${inventoryData.length} inventory items`);
+            } else {
+                alert("ℹ️ No inventory items found");
+            }
+            
+        } catch (error) {
+            console.error("❌ Failed to load inventory:", error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #ff6b6b; padding: 30px;">
+                        ❌ Error: ${error.message}
+                        <br>
+                        <small>Check if backend is running on localhost:3000</small>
+                    </td>
+                </tr>
+            `;
+            alert(`❌ Failed to load inventory: ${error.message}`);
+        } finally {
+            button.disabled = false;
+            button.textContent = "📥 Load Inventory";
+        }
+    }
+    
+    function renderInventoryTable(items) {
+        const tbody = document.getElementById('invBody');
+        
+        if (!items || items.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px; color: #8ab4ff;">
+                        📦 No inventory items found
+                        <br>
+                        <small>Admin hasn't added any items yet</small>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        let tableHTML = '';
+        items.forEach(item => {
+            tableHTML += `
+                <tr>
+                    <td><strong>${escapeHtml(item.itemName || item.name || "Unknown")}</strong></td>
+                    <td>${escapeHtml(item.category || "General")}</td>
+                    <td>${item.availableQty || item.quantity || 0}</td>
+                    <td>${escapeHtml(item.unit || "kg")}</td>
+                    <td>₹${item.price || 0}</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = tableHTML;
+    }
+    
+    // ========== LOAD CROPS TABLE ==========
+    async function loadCropsTable() {
+        console.log("📋 Loading crops...");
+        const tbody = document.getElementById('cropsBody');
+        
+        try {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: #8ab4ff;">
+                        Loading your crops...
+                    </td>
+                </tr>
+            `;
+            
+            const crops = await loadCrops();
+            console.log(`✅ Got ${crops.length} crops`);
+            
+            if (crops.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #8ab4ff;">
+                            No crops added yet
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let tableHTML = '';
+            crops.forEach(crop => {
+                tableHTML += `
+                    <tr>
+                        <td><strong>${escapeHtml(crop.cropName)}</strong></td>
+                        <td>${escapeHtml(crop.season)}</td>
+                        <td>${crop.area}</td>
+                        <td>${crop.quantity}</td>
+                        <td>
+                            <button onclick="deleteCropHandler('${crop._id}')" class="btn-danger">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = tableHTML;
+            
+        } catch (error) {
+            console.error("❌ Failed to load crops:", error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #ff6b6b; padding: 30px;">
+                        Error: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    // ========== DELETE CROP HANDLER ==========
+    window.deleteCropHandler = async function(cropId) {
+        if (!confirm("Delete this crop?")) return;
+        
+        try {
+            await deleteCrop(cropId);
+            alert("✅ Crop deleted");
+            await loadCropsTable();
+        } catch (error) {
+            alert("❌ Delete failed: " + error.message);
+        }
+    };
+    
+    // ========== INITIAL DATA LOAD ==========
+    async function loadDashboardData() {
+        console.log("📥 Loading dashboard data...");
+        
+        // Wait for user to be logged in
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            console.log("⏳ Waiting for login...");
+            setTimeout(loadDashboardData, 1000);
+            return;
+        }
+        
+        console.log(`👋 Welcome ${user.email}`);
+        updateUserInfo(user);
+        
+        // Load crops immediately
+        await loadCropsTable();
+        
+        // Auto-load inventory after 3 seconds
+        setTimeout(async () => {
+            if (inventoryData.length === 0) {
+                console.log("🔄 Auto-loading inventory...");
+                try {
+                    inventoryData = await loadInventory();
+                    if (inventoryData.length > 0) {
+                        renderInventoryTable(inventoryData);
+                        console.log(`✅ Auto-loaded ${inventoryData.length} inventory items`);
+                    }
+                } catch (error) {
+                    console.log("⚠️ Couldn't auto-load inventory:", error.message);
+                }
+            }
+        }, 3000);
+    }
+    
+    // ========== SEARCH INVENTORY ==========
+    document.getElementById('invSearch').addEventListener('input', function() {
+        const term = this.value.toLowerCase().trim();
+        
+        if (!term) {
+            renderInventoryTable(inventoryData);
+            return;
+        }
+        
+        const filtered = inventoryData.filter(item => {
+            const name = (item.itemName || item.name || '').toLowerCase();
+            const category = (item.category || '').toLowerCase();
+            return name.includes(term) || category.includes(term);
+        });
+        
+        renderInventoryTable(filtered);
+    });
+    
+    // Helper function
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    console.log("✅ Dashboard enhanced script ready!");
+  </script>
+</body>
+</html>
